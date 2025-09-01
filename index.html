@@ -461,38 +461,121 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2), 0 0 20px #06b6d4;
         }
+        
+        /* Language menu styles */
+        .language-menu {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 20;
+        }
+        .lang-button {
+            background-color: rgba(30, 41, 59, 0.7);
+            border: 2px solid #8b0000;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .lang-button:hover {
+            background-color: #8b0000;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+        }
+        .lang-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background-color: rgba(30, 41, 59, 0.95);
+            border: 2px solid #8b0000;
+            border-radius: 1rem;
+            padding: 0.5rem;
+            display: none;
+            flex-direction: column;
+            gap: 0.25rem;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            animation: slideInFromTop 0.3s ease-out;
+            min-width: 150px;
+        }
+        .lang-dropdown.visible {
+            display: flex;
+        }
+        .lang-option {
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .lang-option:hover {
+            background-color: rgba(139, 0, 0, 0.8);
+            transform: translateX(5px);
+        }
+        @keyframes slideInFromTop {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .language-icon {
+            margin-right: 0.5rem;
+        }
+
     </style>
 </head>
 <body oncontextmenu="return false;">
+
+    <!-- Language Selection Menu -->
+    <div class="language-menu">
+        <button id="langBtn" class="lang-button">
+            <span id="currentLangLabel">English</span>
+        </button>
+        <div id="langDropdown" class="lang-dropdown">
+            <div class="lang-option" data-lang="en">
+                <span class="language-icon">&#x1F1EC;&#x1F1E7;</span>English
+            </div>
+            <div class="lang-option" data-lang="fr">
+                <span class="language-icon">&#x1F1EB;&#x1F1F7;</span>Français
+            </div>
+            <div class="lang-option" data-lang="it">
+                <span class="language-icon">&#x1F1EE;&#x1F1F9;</span>Italiano
+            </div>
+            <div class="lang-option" data-lang="sq">
+                <span class="language-icon">&#x1F1E6;&#x1F1F1;</span>Shqip
+            </div>
+            <div class="lang-option" data-lang="zh">
+                <span class="language-icon">&#x1F1E8;&#x1F1F3;</span>中文
+            </div>
+        </div>
+    </div>
 
     <!-- Stylish modal for right-click -->
     <div id="access-denied-modal">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="close-icon">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <p class="text-xl font-bold text-red-500 mb-2">ACCÈS REFUSÉ</p>
-        <p class="text-gray-300">Le clic droit est interdit sur cette page.</p>
+        <p id="modal-title" class="text-xl font-bold text-red-500 mb-2">ACCESS DENIED</p>
+        <p id="modal-text" class="text-gray-300">Right-click is forbidden on this page.</p>
     </div>
 
     <!-- Login Page -->
     <div id="loginPage" class="login-container">
-        <h1 class="login-title text-3xl sm:text-4xl">SHADOW</h1>
+        <h1 id="login-title" class="login-title text-3xl sm:text-4xl">SHADOW</h1>
         <img src="https://i.imgur.com/OZMEnuP.jpeg" alt="SHADOW Logo" class="logo-img">
         <div class="flex flex-col items-center w-full">
             <input type="password" id="passwordInput" placeholder="Enter Password" class="pass-input w-full max-w-sm px-4 py-3 rounded-xl text-center mb-4">
             <button id="validateBtn" class="validate-btn w-full max-w-sm py-3 rounded-xl font-bold text-white">Validate</button>
         </div>
-        <p id="errorMsg" class="text-xs mt-4 text-gray-400">Cette page est sécurisée et sans risque.</p>
-        <p id="tutorialPrompt" class="tutorial-message mt-4 text-lg">Pour utiliser le proxy, vous devez d'abord regarder le tutoriel !</p>
+        <p id="errorMsg" class="text-xs mt-4 text-gray-400">This page is secure and risk-free.</p>
+        <p id="tutorialPrompt" class="tutorial-message mt-4 text-lg">To use the proxy, you must first watch the tutorial!</p>
         <a id="tutorialBtn" href="https://uploadnow.io/s/9b535f4e-d422-49d4-953d-d0f35661cd7a?o=t" target="_blank" class="text-sm text-gray-500 hover:text-red-500 transition-colors mt-8">
-            <span class="border-b border-dashed border-gray-500 hover:border-red-500">Tutoriel</span>
+            <span id="tutorialLinkText" class="border-b border-dashed border-gray-500 hover:border-red-500">Tutorial</span>
         </a>
     </div>
 
     <!-- Loading Animation -->
     <div id="loadingPage" class="loading-animation">
         <div class="loading-spinner"></div>
-        <p class="loading-text">Loading...</p>
+        <p id="loadingText" class="loading-text">Loading...</p>
     </div>
 
     <!-- Main Page -->
@@ -502,12 +585,12 @@
         <div id="recaptchaContainer" class="recaptcha-container mt-8 relative">
             <div id="recaptchaWrapper" class="recaptcha-checkbox-wrapper space-x-4">
                 <input type="checkbox" id="recaptchaCheckbox" class="recaptcha-checkbox">
-                <label for="recaptchaCheckbox" class="text-lg">Je ne suis pas un robot</label>
+                <label id="recaptchaLabel" for="recaptchaCheckbox" class="text-lg">I'm not a robot</label>
             </div>
             
             <div id="verificationAnimation" class="verification-animation-inner">
                 <div class="verification-spinner"></div>
-                <p class="text-lg mt-4 font-bold text-red-500">Vérification en cours...</p>
+                <p id="verificationText" class="text-lg mt-4 font-bold text-red-500">Verification in progress...</p>
             </div>
         </div>
 
@@ -525,7 +608,7 @@
                         <p class="text-sm text-gray-400">155.1MB</p>
                     </div>
                     <div id="confirmation1" class="download-confirmation">
-                        Téléchargé !
+                        Downloaded!
                         <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
@@ -549,7 +632,7 @@
                         <p class="text-sm text-gray-400">284.5MB</p>
                     </div>
                     <div id="confirmation2" class="download-confirmation">
-                        Téléchargé !
+                        Downloaded!
                         <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
@@ -562,7 +645,7 @@
         </div>
         
         <button id="unlockBtn" class="w-full max-w-sm py-3 mt-8 rounded-xl font-bold text-white text-lg">
-            Débloquer le site
+            Unlock Site
         </button>
     </div>
 
@@ -572,6 +655,99 @@
     </footer>
 
     <script>
+        const translations = {
+            'en': {
+                'login-title': 'SHADOW',
+                'passwordInput-placeholder': 'Enter Password',
+                'validateBtn': 'Validate',
+                'errorMsg-correct': 'This page is secure and risk-free.',
+                'errorMsg-incorrect': 'Incorrect password!',
+                'tutorialPrompt': 'To use the proxy, you must first watch the tutorial!',
+                'tutorialLinkText': 'Tutorial',
+                'loadingText': 'Loading...',
+                'recaptchaLabel': 'I\'m not a robot',
+                'verificationText': 'Verification in progress...',
+                'confirmation1': 'Downloaded!',
+                'confirmation2': 'Downloaded!',
+                'unlockBtn': 'Unlock Site',
+                'modal-title': 'ACCESS DENIED',
+                'modal-text': 'Right-click is forbidden on this page.',
+                'currentLangLabel': 'English'
+            },
+            'fr': {
+                'login-title': 'SHADOW',
+                'passwordInput-placeholder': 'Entrer le mot de passe',
+                'validateBtn': 'Valider',
+                'errorMsg-correct': 'Cette page est sécurisée et sans risque.',
+                'errorMsg-incorrect': 'Mot de passe incorrect !',
+                'tutorialPrompt': 'Pour utiliser le proxy, vous devez d\'abord regarder le tutoriel !',
+                'tutorialLinkText': 'Tutoriel',
+                'loadingText': 'Chargement...',
+                'recaptchaLabel': 'Je ne suis pas un robot',
+                'verificationText': 'Vérification en cours...',
+                'confirmation1': 'Téléchargé !',
+                'confirmation2': 'Téléchargé !',
+                'unlockBtn': 'Débloquer le site',
+                'modal-title': 'ACCÈS REFUSÉ',
+                'modal-text': 'Le clic droit est interdit sur cette page.',
+                'currentLangLabel': 'Français'
+            },
+            'it': {
+                'login-title': 'SHADOW',
+                'passwordInput-placeholder': 'Inserisci la password',
+                'validateBtn': 'Convalida',
+                'errorMsg-correct': 'Questa pagina è sicura e priva di rischi.',
+                'errorMsg-incorrect': 'Password errata!',
+                'tutorialPrompt': 'Per usare il proxy, devi prima guardare il tutorial!',
+                'tutorialLinkText': 'Tutorial',
+                'loadingText': 'Caricamento in corso...',
+                'recaptchaLabel': 'Non sono un robot',
+                'verificationText': 'Verifica in corso...',
+                'confirmation1': 'Scaricato!',
+                'confirmation2': 'Scaricato!',
+                'unlockBtn': 'Sblocca sito',
+                'modal-title': 'ACCESSO NEGATO',
+                'modal-text': 'Il clic destro è proibito in questa pagina.',
+                'currentLangLabel': 'Italiano'
+            },
+            'sq': {
+                'login-title': 'SHADOW',
+                'passwordInput-placeholder': 'Fut fjalëkalimin',
+                'validateBtn': 'Validoni',
+                'errorMsg-correct': 'Kjo faqe është e sigurt dhe pa rrezik.',
+                'errorMsg-incorrect': 'Fjalëkalimi i gabuar!',
+                'tutorialPrompt': 'Për të përdorur proxy-n, duhet të shikoni fillimisht tutorialin!',
+                'tutorialLinkText': 'Tutorial',
+                'loadingText': 'Duke u ngarkuar...',
+                'recaptchaLabel': 'Nuk jam robot',
+                'verificationText': 'Verifikimi në proces...',
+                'confirmation1': 'Shkarkuar!',
+                'confirmation2': 'Shkarkuar!',
+                'unlockBtn': 'Zhblloko faqen',
+                'modal-title': 'QASJE E MOHUAR',
+                'modal-text': 'Kliko-djathtas është i ndaluar në këtë faqe.',
+                'currentLangLabel': 'Shqip'
+            },
+            'zh': {
+                'login-title': 'SHADOW',
+                'passwordInput-placeholder': '输入密码',
+                'validateBtn': '验证',
+                'errorMsg-correct': '此页面安全无风险。',
+                'errorMsg-incorrect': '密码错误!',
+                'tutorialPrompt': '要使用代理，您必须先观看教程！',
+                'tutorialLinkText': '教程',
+                'loadingText': '加载中...',
+                'recaptchaLabel': '我不是机器人',
+                'verificationText': '正在验证...',
+                'confirmation1': '已下载！',
+                'confirmation2': '已下载！',
+                'unlockBtn': '解锁网站',
+                'modal-title': '访问被拒绝',
+                'modal-text': '禁止在此页面上右键单击。',
+                'currentLangLabel': '中文'
+            }
+        };
+
         const passwordInput = document.getElementById('passwordInput');
         const validateBtn = document.getElementById('validateBtn');
         const loginPage = document.getElementById('loginPage');
@@ -589,6 +765,10 @@
         const verificationAnimation = document.getElementById('verificationAnimation');
         const tutorialBtn = document.getElementById('tutorialBtn');
         const tutorialPrompt = document.getElementById('tutorialPrompt');
+        
+        const langBtn = document.getElementById('langBtn');
+        const langDropdown = document.getElementById('langDropdown');
+        const langOptions = document.querySelectorAll('.lang-option');
 
         const correctPassword = 'SHADOW9988';
         const fileLinks = {
@@ -599,7 +779,35 @@
         const downloadedFiles = new Set();
         const totalFilesToDownload = 2;
 
+        // Function to set the language
+        function setLanguage(lang) {
+            const currentTranslations = translations[lang];
+            if (!currentTranslations) return;
+
+            // Update text for all elements
+            document.getElementById('passwordInput').placeholder = currentTranslations['passwordInput-placeholder'];
+            document.getElementById('validateBtn').textContent = currentTranslations['validateBtn'];
+            document.getElementById('errorMsg').textContent = currentTranslations['errorMsg-correct'];
+            document.getElementById('tutorialPrompt').textContent = currentTranslations['tutorialPrompt'];
+            document.getElementById('tutorialLinkText').textContent = currentTranslations['tutorialLinkText'];
+            document.getElementById('loadingText').textContent = currentTranslations['loadingText'];
+            document.getElementById('recaptchaLabel').textContent = currentTranslations['recaptchaLabel'];
+            document.getElementById('verificationText').textContent = currentTranslations['verificationText'];
+            document.getElementById('confirmation1').textContent = currentTranslations['confirmation1'];
+            document.getElementById('confirmation2').textContent = currentTranslations['confirmation2'];
+            document.getElementById('unlockBtn').textContent = currentTranslations['unlockBtn'];
+            document.getElementById('modal-title').textContent = currentTranslations['modal-title'];
+            document.getElementById('modal-text').textContent = currentTranslations['modal-text'];
+            document.getElementById('currentLangLabel').textContent = currentTranslations['currentLangLabel'];
+            
+            // Save language to localStorage
+            localStorage.setItem('lang', lang);
+        }
+
         window.addEventListener('load', () => {
+            const savedLang = localStorage.getItem('lang') || 'en';
+            setLanguage(savedLang);
+
             if (!localStorage.getItem('tutorialSeen')) {
                 tutorialPrompt.classList.remove('hidden');
                 tutorialBtn.classList.add('tutorial-btn-pulse');
@@ -650,18 +858,20 @@
                     }, 5000);
                 }, 1000);
             } else {
+                const currentLang = localStorage.getItem('lang') || 'en';
+                const currentTranslations = translations[currentLang];
                 if (navigator.vibrate) {
                     navigator.vibrate([100, 50, 100]);
                 }
                 passwordInput.value = '';
-                errorMsg.textContent = 'Mot de passe incorrect !';
+                errorMsg.textContent = currentTranslations['errorMsg-incorrect'];
                 errorMsg.classList.add('shake-animation');
                 passwordInput.classList.add('shake-animation');
                 
                 setTimeout(() => {
                     errorMsg.classList.remove('shake-animation');
                     passwordInput.classList.remove('shake-animation');
-                    errorMsg.textContent = 'Cette page est sécurisée et sans risque.';
+                    errorMsg.textContent = currentTranslations['errorMsg-correct'];
                 }, 800);
             }
         });
@@ -746,6 +956,26 @@
 
         file1.addEventListener('click', (event) => handleFileClick(event, 'file1'));
         file2.addEventListener('click', (event) => handleFileClick(event, 'file2'));
+
+        // Language menu logic
+        langBtn.addEventListener('click', () => {
+            langDropdown.classList.toggle('visible');
+        });
+
+        langOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const lang = option.getAttribute('data-lang');
+                setLanguage(lang);
+                langDropdown.classList.remove('visible');
+            });
+        });
+
+        // Close dropdown if user clicks outside
+        document.addEventListener('click', (event) => {
+            if (!langBtn.contains(event.target) && !langDropdown.contains(event.target)) {
+                langDropdown.classList.remove('visible');
+            }
+        });
     </script>
 </body>
 </html>
