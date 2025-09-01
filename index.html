@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHADOW</title>
+    <title>SHADOW Project</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
@@ -545,18 +545,22 @@
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="close-icon">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <p class="text-xl font-bold text-red-500 mb-2">ACCESS DENIED</p>
-        <p class="text-gray-300">Right-click is forbidden on this page.</p>
+        <p class="text-xl font-bold text-red-500 mb-2">ACCÈS REFUSÉ</p>
+        <p class="text-gray-300">Le clic droit est interdit sur cette page.</p>
     </div>
 
     <!-- VPN Detected Modal -->
-    <div id="vpn-detected-modal">
+    <div id="vpn-detected-modal" class="hidden">
         <div class="vpn-modal-content">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="vpn-icon w-20 h-20 text-red-500 mx-auto mb-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.174 3.353 1.94 3.353h17.846c1.766 0 2.806-1.853 1.94-3.353L13.94 3.376c-.866-1.5-3.033-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
             </svg>
-            <h2 class="text-3xl font-bold text-red-500 mb-2">VPN DETECTED!</h2>
-            <p class="text-lg text-gray-300">Access denied. Please disable your VPN to continue.</p>
+            <h2 class="text-3xl font-bold text-red-500 mb-2">VPN DÉTECTÉ !</h2>
+            <p class="text-lg text-gray-300" id="vpn-modal-message">Accès refusé. Veuillez désactiver votre VPN pour continuer.</p>
+            <div id="vpn-loading-spinner" class="verification-spinner my-4 mx-auto hidden"></div>
+            <button id="retryVpnBtn" class="mt-4 px-6 py-2 rounded-full font-bold text-white bg-red-600 hover:bg-red-700 transition">
+                Réessayer
+            </button>
         </div>
     </div>
 
@@ -569,9 +573,9 @@
             <button id="validateBtn" class="validate-btn w-full max-w-sm py-3 rounded-xl font-bold text-white">Validate</button>
         </div>
         <p id="errorMsg" class="text-xs mt-4 text-gray-400">This page is secure and risk-free.</p>
-        <p id="tutorialPrompt" class="tutorial-message mt-4 text-lg">To use the proxy, you must first watch the tutorial!</p>
+        <p id="tutorialPrompt" class="tutorial-message mt-4 text-lg">Pour utiliser le proxy, vous devez d'abord regarder le tutoriel !</p>
         <a id="tutorialBtn" href="https://uploadnow.io/s/9b535f4e-d422-49d4-953d-d0f35661cd7a?o=t" target="_blank" class="text-sm text-gray-500 hover:text-red-500 transition-colors mt-8">
-            <span class="border-b border-dashed border-gray-500 hover:border-red-500">Tutorial</span>
+            <span class="border-b border-dashed border-gray-500 hover:border-red-500">Tutoriel</span>
         </a>
     </div>
 
@@ -588,12 +592,12 @@
         <div id="recaptchaContainer" class="recaptcha-container mt-8 relative">
             <div id="recaptchaWrapper" class="recaptcha-checkbox-wrapper space-x-4">
                 <input type="checkbox" id="recaptchaCheckbox" class="recaptcha-checkbox">
-                <label for="recaptchaCheckbox" class="text-lg">I am not a robot</label>
+                <label for="recaptchaCheckbox" class="text-lg">Je ne suis pas un robot</label>
             </div>
             
             <div id="verificationAnimation" class="verification-animation-inner">
                 <div class="verification-spinner"></div>
-                <p class="text-lg mt-4 font-bold text-red-500">Verification in progress...</p>
+                <p class="text-lg mt-4 font-bold text-red-500">Vérification en cours...</p>
             </div>
         </div>
 
@@ -611,7 +615,7 @@
                         <p class="text-sm text-gray-400">155.1MB</p>
                     </div>
                     <div id="confirmation1" class="download-confirmation">
-                        Downloaded!
+                        Téléchargé !
                         <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
@@ -635,7 +639,7 @@
                         <p class="text-sm text-gray-400">284.5MB</p>
                     </div>
                     <div id="confirmation2" class="download-confirmation">
-                        Downloaded!
+                        Téléchargé !
                         <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
@@ -648,7 +652,7 @@
         </div>
         
         <button id="unlockBtn" class="w-full max-w-sm py-3 mt-8 rounded-xl font-bold text-white text-lg">
-            Unlock Site
+            Débloquer le site
         </button>
     </div>
 
@@ -670,6 +674,9 @@
         const modal = document.getElementById('access-denied-modal');
         const vpnModal = document.getElementById('vpn-detected-modal');
         const vpnModalContent = document.querySelector('#vpn-detected-modal .vpn-modal-content');
+        const vpnModalMessage = document.getElementById('vpn-modal-message');
+        const vpnLoadingSpinner = document.getElementById('vpn-loading-spinner');
+        const retryVpnBtn = document.getElementById('retryVpnBtn');
         const recaptchaContainer = document.getElementById('recaptchaContainer');
         const recaptchaWrapper = document.getElementById('recaptchaWrapper');
         const recaptchaCheckbox = document.getElementById('recaptchaCheckbox');
@@ -686,17 +693,31 @@
         let isVerified = false;
         const downloadedFiles = new Set();
         const totalFilesToDownload = 2;
+        let vpnDetected = false;
 
         /**
          * @brief Affiche le modal de détection de VPN avec des animations.
          */
         function showVpnModal() {
+            vpnModal.classList.remove('hidden');
             vpnModal.classList.add('visible');
             document.body.style.overflow = 'hidden'; // Empêche le défilement
             
             setTimeout(() => {
                 vpnModalContent.classList.add('show-content');
             }, 100);
+        }
+
+        /**
+         * @brief Cache le modal de détection de VPN et permet à l'utilisateur de continuer.
+         */
+        function hideVpnModalAndProceed() {
+            vpnModalContent.classList.remove('show-content');
+            vpnModal.classList.remove('visible');
+            document.body.style.overflow = '';
+            // Permet l'interaction avec le reste de la page
+            loginPage.style.pointerEvents = 'auto';
+            mainPage.style.pointerEvents = 'auto';
         }
 
         /**
@@ -748,11 +769,7 @@
                 // Exécution des deux vérifications en parallèle
                 const [apiDetected, webrtcDetected] = await Promise.all([apiPromise, webrtcPromise]);
                 
-                if (apiDetected || webrtcDetected) {
-                    showVpnModal();
-                    return true;
-                }
-                return false;
+                return apiDetected || webrtcDetected;
             } catch (error) {
                 console.error('General VPN detection error:', error);
                 return false;
@@ -760,12 +777,38 @@
         }
         
         // Exécution de la détection de VPN au chargement de la page
-        window.addEventListener('load', () => {
-             detectVPN();
-             if (!localStorage.getItem('tutorialSeen')) {
+        window.addEventListener('load', async () => {
+            vpnDetected = await detectVPN();
+            if (vpnDetected) {
+                showVpnModal();
+            }
+
+            if (!localStorage.getItem('tutorialSeen')) {
                 tutorialPrompt.classList.remove('hidden');
                 tutorialBtn.classList.add('tutorial-btn-pulse');
             }
+        });
+
+        // Gère le bouton "Réessayer" dans le modal VPN
+        retryVpnBtn.addEventListener('click', async () => {
+            vpnModalMessage.textContent = 'Vérification en cours...';
+            vpnLoadingSpinner.classList.remove('hidden');
+            retryVpnBtn.classList.add('hidden');
+            
+            const isVpnStillDetected = await detectVPN();
+            
+            if (!isVpnStillDetected) {
+                vpnDetected = false;
+                vpnModalMessage.textContent = 'VPN désactivé. Vous pouvez continuer.';
+                setTimeout(() => {
+                    hideVpnModalAndProceed();
+                }, 1500);
+            } else {
+                vpnModalMessage.textContent = 'Accès refusé. Veuillez désactiver votre VPN pour continuer.';
+            }
+
+            vpnLoadingSpinner.classList.add('hidden');
+            retryVpnBtn.classList.remove('hidden');
         });
 
         // Désactive les raccourcis clavier spécifiques pour la sécurité
@@ -792,6 +835,11 @@
                 }
                 return;
             }
+
+            if (vpnDetected) {
+                showVpnModal();
+                return;
+            }
         
             if (passwordInput.value === correctPassword) {
                 loginPage.classList.add('fade-out');
@@ -816,14 +864,14 @@
                     navigator.vibrate([100, 50, 100]);
                 }
                 passwordInput.value = '';
-                errorMsg.textContent = 'Incorrect password!';
+                errorMsg.textContent = 'Mot de passe incorrect !';
                 errorMsg.classList.add('shake-animation');
                 passwordInput.classList.add('shake-animation');
                 
                 setTimeout(() => {
                     errorMsg.classList.remove('shake-animation');
                     passwordInput.classList.remove('shake-animation');
-                    errorMsg.textContent = 'This page is secure and risk-free.';
+                    errorMsg.textContent = 'Cette page est sécurisée et sans risque.';
                 }, 800);
             }
         });
@@ -883,9 +931,11 @@
         recaptchaCheckbox.addEventListener('change', async () => {
             if (recaptchaCheckbox.checked) {
                 // Seconde vérification VPN au moment du clic
-                const vpnDetected = await detectVPN();
-                if (vpnDetected) {
+                const vpnIsDetected = await detectVPN();
+                if (vpnIsDetected) {
+                    vpnDetected = true;
                     recaptchaCheckbox.checked = false; // Désélectionne la case
+                    showVpnModal();
                     return; // Stoppe le processus si un VPN est détecté
                 }
 
