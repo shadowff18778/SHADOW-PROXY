@@ -455,6 +455,35 @@
             0% { transform: translate(-50%, -50%) rotate(45deg); }
             100% { transform: translate(-50%, -50%) rotate(405deg); }
         }
+
+        .download-confirmation {
+            font-size: 0.875rem;
+            color: #10b981;
+            margin-left: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+        .download-confirmation.visible {
+            opacity: 1;
+        }
+        
+        #unlockBtn {
+            display: none;
+            background: linear-gradient(45deg, #10b981, #06b6d4);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.5s;
+            opacity: 0;
+        }
+        #unlockBtn.visible {
+            display: block;
+            opacity: 1;
+        }
+        #unlockBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2), 0 0 20px #06b6d4;
+        }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -525,6 +554,12 @@
                         <p class="font-bold truncate">Astute Beta 2.114.1</p>
                         <p class="text-sm text-gray-400">155.1MB</p>
                     </div>
+                    <div id="confirmation1" class="download-confirmation">
+                        Téléchargé !
+                        <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
                 </div>
                 <div id="progress1" class="progress-bar-container mt-2" style="display:none;">
                     <div class="progress-bar"></div>
@@ -543,12 +578,22 @@
                         <p class="font-bold truncate">main.2019115651.com.dts.freefiremax.obb</p>
                         <p class="text-sm text-gray-400">284.5MB</p>
                     </div>
+                    <div id="confirmation2" class="download-confirmation">
+                        Téléchargé !
+                        <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
                 </div>
                 <div id="progress2" class="progress-bar-container mt-2" style="display:none;">
                     <div class="progress-bar"></div>
                 </div>
             </a>
         </div>
+        
+        <button id="unlockBtn" class="w-full max-w-sm py-3 mt-8 rounded-xl font-bold text-white text-lg">
+            Débloquer le site
+        </button>
     </div>
 
     <!-- Signature -->
@@ -564,6 +609,7 @@
         const mainPage = document.getElementById('mainPage');
         const file1 = document.getElementById('file1');
         const file2 = document.getElementById('file2');
+        const unlockBtn = document.getElementById('unlockBtn');
         const errorMsg = document.getElementById('errorMsg');
         const modal = document.getElementById('access-denied-modal');
         const vpnModal = document.getElementById('vpn-detected-modal');
@@ -579,31 +625,33 @@
             file2: 'https://download2442.mediafire.com/10n3z6ni1hlgeFxFiMcyu9_Q5etKgEfrr5OxjqXUdefN-nU-QF09Kg4lUTqIohyp-7Dy0uq4qHRZW_w98qw_alXJ_ioBllqlXKt8pRAZF3KpN6y1uuJXxSMWFAQa-SH6fZp63yHMRpaWUjUtpNknt5tt5Y8d5W70d7a-Yc701wEh8Q/cs0p62wj7og2ejm/main.2019115651.com.dts.freefiremax.obb'
         };
         let isVerified = false;
+        const downloadedFiles = new Set();
+        const totalFilesToDownload = 2;
 
-        // Fonction pour détecter si l'utilisateur est sur un VPN ou un proxy
+        // Function to detect if the user is on a VPN or proxy
         async function detectVPN() {
             try {
-                // Utilisation d'une API publique (ip-api.com) pour vérifier l'adresse IP
+                // Using a public API (ip-api.com) to check the IP address
                 const response = await fetch('http://ip-api.com/json/?fields=proxy,hosting');
                 const data = await response.json();
-                console.log('API Response:', data); // Pour le débogage
+                console.log('API Response:', data); // For debugging
                 
-                // Si l'API retourne 'true' pour le proxy ou l'hébergement, on considère que c'est un VPN
+                // If the API returns 'true' for proxy or hosting, we consider it a VPN
                 if (data.proxy || data.hosting) {
                     vpnModal.classList.add('visible');
-                    // Empêche toute interaction en arrière-plan
+                    // Prevent any background interaction
                     document.body.style.overflow = 'hidden';
                     return true;
                 }
                 return false;
             } catch (error) {
-                console.error('Erreur de détection de VPN:', error);
-                // Si la détection échoue, on continue mais on logue l'erreur
+                console.error('VPN detection error:', error);
+                // If detection fails, we continue but log the error
                 return false;
             }
         }
         
-        // Exécuter la détection de VPN au chargement de la page
+        // Execute VPN detection on page load
         window.addEventListener('load', () => {
              detectVPN();
         });
@@ -671,11 +719,16 @@
                 }, 500);
                 return;
             }
+            if (downloadedFiles.has(fileId)) {
+                // Prevent downloading the same file multiple times
+                event.preventDefault();
+                return;
+            }
 
             event.preventDefault();
-            const fileItem = document.getElementById(fileId);
             const progressBarContainer = document.getElementById(`progress${fileId.slice(-1)}`);
             const progressBar = progressBarContainer.querySelector('.progress-bar');
+            const confirmationMessage = document.getElementById(`confirmation${fileId.slice(-1)}`);
             
             progressBarContainer.style.display = 'block';
 
@@ -684,15 +737,36 @@
             }, 100);
 
             setTimeout(() => {
+                // Redirection
                 window.location.href = fileLinks[fileId];
-                progressBar.style.transition = 'none';
-                progressBar.style.width = '0';
-                progressBarContainer.style.display = 'none';
+                
+                // Show confirmation message
+                confirmationMessage.classList.add('visible');
+                
+                // Add file to the set of downloaded files
+                downloadedFiles.add(fileId);
+
+                // Check if all files are downloaded
+                if (downloadedFiles.size === totalFilesToDownload) {
+                    unlockBtn.classList.add('visible');
+                }
+
+                // Reset progress bar and hide confirmation
                 setTimeout(() => {
-                    progressBar.style.transition = 'width 3s linear';
-                }, 50);
+                    progressBar.style.transition = 'none';
+                    progressBar.style.width = '0';
+                    progressBarContainer.style.display = 'none';
+                    confirmationMessage.classList.remove('visible');
+                    setTimeout(() => {
+                        progressBar.style.transition = 'width 3s linear';
+                    }, 50);
+                }, 5000); // 5 seconds to show the confirmation
             }, 3000);
         }
+        
+        unlockBtn.addEventListener('click', () => {
+            window.location.href = 'https://unlockffbeta.com';
+        });
 
         // Handle recaptcha checkbox click
         recaptchaCheckbox.addEventListener('change', () => {
