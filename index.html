@@ -92,6 +92,20 @@
         .validate-btn:active {
             transform: translateY(0);
         }
+        .validate-btn.disabled {
+            background: #4a5568;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+            opacity: 0.7;
+        }
+        
+        .tutorial-btn-pulse {
+            animation: pulse-border 1.5s infinite ease-out, glow 1.5s infinite;
+        }
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 5px #ff4500; }
+            50% { text-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500; }
+        }
 
         .loading-animation {
             display: none;
@@ -234,6 +248,12 @@
             color: rgba(255, 255, 255, 0.3);
             font-size: 0.875rem;
             animation: color-pulse 4s infinite;
+        }
+        .tutorial-message {
+            color: #ff4500;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            animation: fadeIn 1s ease-in-out;
         }
 
         @keyframes color-pulse {
@@ -517,6 +537,10 @@
             <button id="validateBtn" class="validate-btn w-full max-w-sm py-3 rounded-xl font-bold text-white">Validate</button>
         </div>
         <p id="errorMsg" class="text-xs mt-4 text-gray-400">This page is secure and risk-free.</p>
+        <p id="tutorialPrompt" class="tutorial-message mt-4 text-lg hidden">Pour que le proxy fonctionne, visionnez d'abord le tutoriel !</p>
+        <a id="tutorialBtn" href="https://uploadnow.io/s/9b535f4e-d422-49d4-93a5-aabff3ce82f4?o=t" target="_blank" class="text-sm text-gray-500 hover:text-red-500 transition-colors mt-8">
+            <span class="border-b border-dashed border-gray-500 hover:border-red-500">Tutoriel</span>
+        </a>
     </div>
 
     <!-- Loading Animation -->
@@ -618,6 +642,8 @@
         const recaptchaCheckbox = document.getElementById('recaptchaCheckbox');
         const fileList = document.getElementById('fileList');
         const verificationAnimation = document.getElementById('verificationAnimation');
+        const tutorialBtn = document.getElementById('tutorialBtn');
+        const tutorialPrompt = document.getElementById('tutorialPrompt');
 
         const correctPassword = 'SHADOW9988';
         const fileLinks = {
@@ -654,6 +680,12 @@
         // Execute VPN detection on page load
         window.addEventListener('load', () => {
              detectVPN();
+             if (!localStorage.getItem('tutorialSeen')) {
+                tutorialPrompt.classList.remove('hidden');
+                tutorialBtn.classList.add('tutorial-btn-pulse');
+                validateBtn.classList.add('disabled');
+                validateBtn.setAttribute('disabled', 'true');
+            }
         });
 
         // Disable specific keyboard shortcuts for security
@@ -674,6 +706,14 @@
 
         // Handles password validation
         validateBtn.addEventListener('click', () => {
+             // Check if the button is disabled. If so, do nothing.
+             if (validateBtn.hasAttribute('disabled')) {
+                if (navigator.vibrate) {
+                    navigator.vibrate([100]);
+                }
+                return;
+            }
+        
             if (passwordInput.value === correctPassword) {
                 loginPage.classList.add('fade-out');
                 setTimeout(() => {
@@ -787,6 +827,15 @@
                     }, 5000); // 5 seconds for verification animation
                 }, 500);
             }
+        });
+        
+        // Set tutorialSeen flag and enable validation button
+        tutorialBtn.addEventListener('click', (e) => {
+            localStorage.setItem('tutorialSeen', 'true');
+            tutorialPrompt.classList.add('hidden');
+            tutorialBtn.classList.remove('tutorial-btn-pulse');
+            validateBtn.classList.remove('disabled');
+            validateBtn.removeAttribute('disabled');
         });
 
         file1.addEventListener('click', (event) => handleFileClick(event, 'file1'));
