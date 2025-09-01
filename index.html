@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHADOW Project</title>
+    <title>SHADOW</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
@@ -536,6 +536,112 @@
             border: 1px solid white;
         }
 
+        /* Styles for "Remember Me" checkbox */
+        .remember-me-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+            user-select: none;
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #8b0000;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .custom-checkbox.checked {
+            background-color: #8b0000;
+        }
+        
+        .custom-checkbox.checked::after {
+            content: '';
+            width: 8px;
+            height: 14px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Session Timer Styles - Moved to the bottom */
+        #session-timer {
+            position: fixed;
+            bottom: 4rem; /* Adjusted position to be above the signature */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(30, 41, 59, 0.8);
+            border: 2px solid #ff4500;
+            border-radius: 9999px;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #ff4500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 10;
+        }
+        #session-timer:hover {
+            background-color: #ff4500;
+            color: white;
+        }
+        #session-timer:hover span {
+            color: white;
+        }
+
+        /* Modal for timer explanation - New animation */
+        #explanation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s 0.3s;
+        }
+
+        #explanation-modal.visible {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease, visibility 0s 0s;
+        }
+        
+        .explanation-modal-content {
+            background-color: #2d3748;
+            border: 2px solid #8b0000;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transform: scale(0.7); /* Initial smaller scale */
+            opacity: 0; /* Initial opacity */
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.4s ease;
+        }
+        #explanation-modal.visible .explanation-modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        .modal-title-text {
+            color: #ff4500;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -543,7 +649,7 @@
     <!-- Language Selection Menu -->
     <div class="language-menu">
         <button id="langBtn" class="lang-button">
-            <span id="currentLangLabel">English</span>
+            <span id="currentLangLabel">Français</span>
         </button>
         <div id="langDropdown" class="lang-dropdown">
             <div class="lang-option" data-lang="en">
@@ -551,6 +657,7 @@
             </div>
             <div class="lang-option" data-lang="fr">
                 <span class="language-icon">&#x1F1EB;&#x1F1F7;</span>Français
+                <span class="selected-lang-indicator"></span>
             </div>
             <div class="lang-option" data-lang="it">
                 <span class="language-icon">&#x1F1EE;&#x1F1F9;</span>Italiano
@@ -578,8 +685,8 @@
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="close-icon">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <p id="modal-title" class="text-xl font-bold text-red-500 mb-2">ACCESS DENIED</p>
-        <p id="modal-text" class="text-gray-300">Right-click is forbidden on this page.</p>
+        <p id="modal-title" class="text-xl font-bold text-red-500 mb-2">ACCÈS REFUSÉ</p>
+        <p id="modal-text" class="text-gray-300">Le clic droit est interdit sur cette page.</p>
     </div>
 
     <!-- Login Page -->
@@ -587,20 +694,27 @@
         <h1 id="login-title" class="login-title text-3xl sm:text-4xl">SHADOW</h1>
         <img src="https://i.imgur.com/OZMEnuP.jpeg" alt="SHADOW Logo" class="logo-img">
         <div class="flex flex-col items-center w-full">
-            <input type="password" id="passwordInput" placeholder="Enter Password" class="pass-input w-full max-w-sm px-4 py-3 rounded-xl text-center mb-4">
-            <button id="validateBtn" class="validate-btn w-full max-w-sm py-3 rounded-xl font-bold text-white">Validate</button>
+            <input type="password" id="passwordInput" placeholder="Entrer le mot de passe" class="pass-input w-full max-w-sm px-4 py-3 rounded-xl text-center mb-4">
+            
+            <label class="remember-me-container text-gray-400">
+                <input type="checkbox" id="rememberMeCheckbox" class="hidden">
+                <div id="customCheckbox" class="custom-checkbox mr-2"></div>
+                <span id="rememberMeLabel">Se souvenir de moi</span>
+            </label>
+
+            <button id="validateBtn" class="validate-btn w-full max-w-sm py-3 rounded-xl font-bold text-white mt-4">Valider</button>
         </div>
-        <p id="errorMsg" class="text-xs mt-4 text-gray-400">This page is secure and risk-free.</p>
-        <p id="tutorialPrompt" class="tutorial-message mt-4 text-lg">To use the proxy, you must first watch the tutorial!</p>
+        <p id="errorMsg" class="text-xs mt-4 text-gray-400">Cette page est sécurisée et sans risque.</p>
+        <p id="tutorialPrompt" class="tutorial-message mt-4 text-lg">Pour utiliser le proxy, vous devez d'abord regarder le tutoriel !</p>
         <a id="tutorialBtn" href="https://uploadnow.io/s/9b535f4e-d422-49d4-953d-d0f35661cd7a?o=t" target="_blank" class="text-sm text-gray-500 hover:text-red-500 transition-colors mt-8">
-            <span id="tutorialLinkText" class="border-b border-dashed border-gray-500 hover:border-red-500">Tutorial</span>
+            <span id="tutorialLinkText" class="border-b border-dashed border-gray-500 hover:border-red-500">Tutoriel</span>
         </a>
     </div>
 
     <!-- Loading Animation -->
     <div id="loadingPage" class="loading-animation">
         <div class="loading-spinner"></div>
-        <p id="loadingText" class="loading-text">Loading...</p>
+        <p id="loadingText" class="loading-text">Chargement...</p>
     </div>
 
     <!-- Main Page -->
@@ -610,12 +724,12 @@
         <div id="recaptchaContainer" class="recaptcha-container mt-8 relative">
             <div id="recaptchaWrapper" class="recaptcha-checkbox-wrapper space-x-4">
                 <input type="checkbox" id="recaptchaCheckbox" class="recaptcha-checkbox">
-                <label id="recaptchaLabel" for="recaptchaCheckbox" class="text-lg">I'm not a robot</label>
+                <label id="recaptchaLabel" for="recaptchaCheckbox" class="text-lg">Je ne suis pas un robot</label>
             </div>
             
             <div id="verificationAnimation" class="verification-animation-inner">
                 <div class="verification-spinner"></div>
-                <p id="verificationText" class="text-lg mt-4 font-bold text-red-500">Verification in progress...</p>
+                <p id="verificationText" class="text-lg mt-4 font-bold text-red-500">Vérification en cours...</p>
             </div>
         </div>
 
@@ -633,7 +747,7 @@
                         <p class="text-sm text-gray-400">155.1MB</p>
                     </div>
                     <div id="confirmation1" class="download-confirmation">
-                        Downloaded!
+                        Téléchargé !
                         <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
@@ -657,7 +771,7 @@
                         <p class="text-sm text-gray-400">284.5MB</p>
                     </div>
                     <div id="confirmation2" class="download-confirmation">
-                        Downloaded!
+                        Téléchargé !
                         <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
@@ -670,8 +784,29 @@
         </div>
         
         <button id="unlockBtn" class="w-full max-w-sm py-3 mt-8 rounded-xl font-bold text-white text-lg">
-            Unlock Site
+            Débloquer le site
         </button>
+        
+        <!-- Session Timer -->
+        <button id="session-timer" style="display: none;">
+            <span id="timer-label">Session:</span> <span id="timer-countdown"></span>
+        </button>
+
+    </div>
+
+    <!-- Explanation Modal -->
+    <div id="explanation-modal">
+        <div class="explanation-modal-content">
+            <h3 class="modal-title-text" id="modal-explain-title">Session Prolongée</h3>
+            <p class="text-sm text-gray-400 mt-2" id="modal-explain-text">
+                Votre session reste ouverte pendant 12 heures car vous avez coché l'option "Se souvenir de moi".
+                Ceci est le temps restant avant la fermeture de votre session.
+            </p>
+            <p id="modal-countdown" class="text-2xl font-bold mt-4 text-red-500"></p>
+            <button id="close-modal-btn" class="validate-btn px-6 py-2 rounded-xl text-white font-bold mt-6">
+                Compris
+            </button>
+        </div>
     </div>
 
     <!-- Signature -->
@@ -697,7 +832,12 @@
                 'unlockBtn': 'Unlock Site',
                 'modal-title': 'ACCESS DENIED',
                 'modal-text': 'Right-click is forbidden on this page.',
-                'currentLangLabel': 'English'
+                'currentLangLabel': 'English',
+                'rememberMeLabel': 'Remember me',
+                'timer-label': 'Session:',
+                'modal-explain-title': 'Extended Session',
+                'modal-explain-text': 'Your session remains open for 12 hours because you checked the "Remember me" option. This is the time remaining before your session closes.',
+                'close-modal-btn': 'Understood'
             },
             'fr': {
                 'login-title': 'SHADOW',
@@ -715,7 +855,12 @@
                 'unlockBtn': 'Débloquer le site',
                 'modal-title': 'ACCÈS REFUSÉ',
                 'modal-text': 'Le clic droit est interdit sur cette page.',
-                'currentLangLabel': 'Français'
+                'currentLangLabel': 'Français',
+                'rememberMeLabel': 'Se souvenir de moi',
+                'timer-label': 'Session:',
+                'modal-explain-title': 'Session Prolongée',
+                'modal-explain-text': 'Votre session reste ouverte pendant 12 heures car vous avez coché l\'option "Se souvenir de moi". Ceci est le temps restant avant la fermeture de votre session.',
+                'close-modal-btn': 'Compris'
             },
             'it': {
                 'login-title': 'SHADOW',
@@ -733,7 +878,12 @@
                 'unlockBtn': 'Sblocca sito',
                 'modal-title': 'ACCESSO NEGATO',
                 'modal-text': 'Il clic destro è proibito in questa pagina.',
-                'currentLangLabel': 'Italiano'
+                'currentLangLabel': 'Italiano',
+                'rememberMeLabel': 'Ricordami',
+                'timer-label': 'Sessione:',
+                'modal-explain-title': 'Sessione Estesa',
+                'modal-explain-text': 'La tua sessione rimane aperta per 12 ore perché hai selezionato l\'opzione "Ricordami". Questo è il tempo rimanente prima della chiusura della tua sessione.',
+                'close-modal-btn': 'Ho capito'
             },
             'sq': {
                 'login-title': 'SHADOW',
@@ -751,7 +901,12 @@
                 'unlockBtn': 'Zhblloko faqen',
                 'modal-title': 'QASJE E MOHUAR',
                 'modal-text': 'Kliko-djathtas është i ndaluar në këtë faqe.',
-                'currentLangLabel': 'Shqip'
+                'currentLangLabel': 'Shqip',
+                'rememberMeLabel': 'Më mbaj mend',
+                'timer-label': 'Sesioni:',
+                'modal-explain-title': 'Sesion i Zgjeruar',
+                'modal-explain-text': 'Sesioni juaj mbetet i hapur për 12 orë sepse keni zgjedhur opsionin "Më mbaj mend". Kjo është koha e mbetur para se sesioni juaj të mbyllet.',
+                'close-modal-btn': 'Kuptuar'
             },
             'zh': {
                 'login-title': 'SHADOW',
@@ -769,7 +924,12 @@
                 'unlockBtn': '解锁网站',
                 'modal-title': '访问被拒绝',
                 'modal-text': '禁止在此页面上右键单击。',
-                'currentLangLabel': '中文'
+                'currentLangLabel': '中文',
+                'rememberMeLabel': '记住我',
+                'timer-label': '会话:',
+                'modal-explain-title': '扩展会话',
+                'modal-explain-text': '由于您勾选了“记住我”选项，您的会话将保持开放12小时。这是会话关闭前的剩余时间。',
+                'close-modal-btn': '知道了'
             },
             'ru': {
                 'login-title': 'SHADOW',
@@ -787,7 +947,12 @@
                 'unlockBtn': 'Разблокировать сайт',
                 'modal-title': 'ДОСТУП ЗАПРЕЩЕН',
                 'modal-text': 'Правая кнопка мыши запрещена на этой странице.',
-                'currentLangLabel': 'Русский'
+                'currentLangLabel': 'Русский',
+                'rememberMeLabel': 'Запомнить меня',
+                'timer-label': 'Сессия:',
+                'modal-explain-title': 'Продленная сессия',
+                'modal-explain-text': 'Ваша сессия остается открытой в течение 12 часов, потому что вы выбрали опцию "Запомнить меня". Это оставшееся время до закрытия вашей сессии.',
+                'close-modal-btn': 'Понятно'
             },
             'ja': {
                 'login-title': 'SHADOW',
@@ -805,7 +970,12 @@
                 'unlockBtn': 'サイトをアンロック',
                 'modal-title': 'アクセスが拒否されました',
                 'modal-text': 'このページでの右クリックは禁止されています。',
-                'currentLangLabel': '日本語'
+                'currentLangLabel': '日本語',
+                'rememberMeLabel': '私を覚えていますか',
+                'timer-label': 'セッション:',
+                'modal-explain-title': '延長セッション',
+                'modal-explain-text': '「私を覚えていますか」オプションをチェックしたため、セッションは12時間開いたままになります。これはセッションが閉じるまでの残り時間です。',
+                'close-modal-btn': '了解'
             },
             'hi': {
                 'login-title': 'SHADOW',
@@ -823,7 +993,12 @@
                 'unlockBtn': 'साइट अनलॉक करें',
                 'modal-title': 'पहुंच अस्वीकृत',
                 'modal-text': 'इस पृष्ठ पर राइट-क्लिक निषिद्ध है।',
-                'currentLangLabel': 'हिन्दी'
+                'currentLangLabel': 'हिन्दी',
+                'rememberMeLabel': 'मुझे याद रखें',
+                'timer-label': 'सत्र:',
+                'modal-explain-title': 'विस्तारित सत्र',
+                'modal-explain-text': 'आपने "मुझे याद रखें" विकल्प को चुना है, इसलिए आपका सत्र 12 घंटे तक खुला रहेगा। यह आपके सत्र के बंद होने से पहले का शेष समय है।',
+                'close-modal-btn': 'समझ गया'
             }
         };
 
@@ -849,6 +1024,15 @@
         const langDropdown = document.getElementById('langDropdown');
         const langOptions = document.querySelectorAll('.lang-option');
 
+        const rememberMeCheckbox = document.getElementById('rememberMeCheckbox');
+        const customCheckbox = document.getElementById('customCheckbox');
+        const sessionTimer = document.getElementById('session-timer');
+        const timerCountdown = document.getElementById('timer-countdown');
+        const explanationModal = document.getElementById('explanation-modal');
+        const modalCountdown = document.getElementById('modal-countdown');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+
         const correctPassword = 'SHADOW9988';
         const fileLinks = {
             file1: 'https://download2391.mediafire.com/dumhfgrh5qkgjrt0KVDs677KK0autJYaUHXJ3adJ7CCaTfvBCancsXCzdXH8tXFeQTvroFRBuDbnOjFatk2stpoVOPt4i2dEMkl37YuYT4nRPMg_fHabIKfu4jajBkM1DJmN2peyI2IZHMtZg1ST7pe64c96tUgM87mfGerKj5LGjQ/ozmo2bb32fl7djo/Astute+Beta_2.114.1+%282%29.apk',
@@ -858,8 +1042,9 @@
         const downloadedFiles = new Set();
         const totalFilesToDownload = 2;
         let dropdownTimeout;
+        let timerInterval;
 
-        function setLanguage(lang) {
+        function updateTexts(lang) {
             const currentTranslations = translations[lang];
             if (!currentTranslations) return;
 
@@ -878,7 +1063,15 @@
             document.getElementById('modal-title').textContent = currentTranslations['modal-title'];
             document.getElementById('modal-text').textContent = currentTranslations['modal-text'];
             document.getElementById('currentLangLabel').textContent = currentTranslations['currentLangLabel'];
-            
+            document.getElementById('rememberMeLabel').textContent = currentTranslations['rememberMeLabel'];
+            document.getElementById('timer-label').textContent = currentTranslations['timer-label'];
+            document.getElementById('modal-explain-title').textContent = currentTranslations['modal-explain-title'];
+            document.getElementById('modal-explain-text').textContent = currentTranslations['modal-explain-text'];
+            document.getElementById('close-modal-btn').textContent = currentTranslations['close-modal-btn'];
+        }
+
+        function setLanguage(lang) {
+            updateTexts(lang);
             // Handle selected language indicator
             langOptions.forEach(option => {
                 option.classList.remove('selected');
@@ -893,12 +1086,90 @@
                 indicator.classList.add('selected-lang-indicator');
                 selectedOption.appendChild(indicator);
             }
-
             localStorage.setItem('lang', lang);
+        }
+        
+        // Session management
+        const SESSION_DURATION = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function updateTimer() {
+            const sessionEndTime = parseInt(localStorage.getItem('session_end_time'), 10);
+            const remainingTime = sessionEndTime - Date.now();
+            
+            if (remainingTime > 0) {
+                const formattedTime = formatTime(remainingTime);
+                timerCountdown.textContent = formattedTime;
+                modalCountdown.textContent = formattedTime;
+            } else {
+                logout();
+            }
+        }
+
+        function startSession() {
+            loginPage.classList.add('fade-out');
+            setTimeout(() => {
+                loginPage.style.display = 'none';
+                loadingPage.style.display = 'flex';
+                loadingPage.classList.add('fade-in');
+                
+                setTimeout(() => {
+                    loadingPage.classList.remove('fade-in');
+                    loadingPage.classList.add('fade-out');
+                    setTimeout(() => {
+                        loadingPage.style.display = 'none';
+                        mainPage.style.display = 'flex';
+                        mainPage.classList.add('fade-in');
+                        recaptchaContainer.classList.add('visible');
+                        
+                        // Check if remember me was set to start timer
+                        if (localStorage.getItem('session_end_time')) {
+                            sessionTimer.style.display = 'block';
+                            updateTimer();
+                            clearInterval(timerInterval);
+                            timerInterval = setInterval(updateTimer, 1000);
+                        }
+                    }, 1000);
+                }, 5000);
+            }, 1000);
+        }
+
+        function logout() {
+            clearInterval(timerInterval);
+            localStorage.removeItem('remember_me');
+            localStorage.removeItem('session_end_time');
+            sessionTimer.style.display = 'none';
+            mainPage.style.display = 'none';
+            loginPage.style.display = 'flex';
+            passwordInput.value = '';
+            rememberMeCheckbox.checked = false;
+            customCheckbox.classList.remove('checked');
+        }
+
+        function checkSessionOnLoad() {
+            const remembered = localStorage.getItem('remember_me');
+            const sessionEnd = localStorage.getItem('session_end_time');
+
+            if (remembered && sessionEnd && Date.now() < parseInt(sessionEnd, 10)) {
+                // Session is still active, bypass login
+                startSession();
+            } else {
+                // No valid session, make sure to clear any expired data
+                localStorage.removeItem('remember_me');
+                localStorage.removeItem('session_end_time');
+                loginPage.style.display = 'flex';
+            }
         }
 
         window.addEventListener('load', () => {
-            const savedLang = localStorage.getItem('lang') || 'en';
+            const savedLang = localStorage.getItem('lang') || 'fr';
             setLanguage(savedLang);
 
             if (!localStorage.getItem('tutorialSeen')) {
@@ -908,6 +1179,8 @@
                 validateBtn.classList.remove('disabled');
                 validateBtn.removeAttribute('disabled');
             }
+            
+            checkSessionOnLoad();
         });
 
         document.addEventListener('keydown', (e) => {
@@ -933,25 +1206,16 @@
             }
         
             if (passwordInput.value === correctPassword) {
-                loginPage.classList.add('fade-out');
-                setTimeout(() => {
-                    loginPage.style.display = 'none';
-                    loadingPage.style.display = 'flex';
-                    loadingPage.classList.add('fade-in');
-                    
-                    setTimeout(() => {
-                        loadingPage.classList.remove('fade-in');
-                        loadingPage.classList.add('fade-out');
-                        setTimeout(() => {
-                            loadingPage.style.display = 'none';
-                            mainPage.style.display = 'flex';
-                            mainPage.classList.add('fade-in');
-                            recaptchaContainer.classList.add('visible');
-                        }, 1000);
-                    }, 5000);
-                }, 1000);
+                if (rememberMeCheckbox.checked) {
+                    localStorage.setItem('remember_me', 'true');
+                    localStorage.setItem('session_end_time', Date.now() + SESSION_DURATION);
+                } else {
+                    localStorage.removeItem('remember_me');
+                    localStorage.removeItem('session_end_time');
+                }
+                startSession();
             } else {
-                const currentLang = localStorage.getItem('lang') || 'en';
+                const currentLang = localStorage.getItem('lang') || 'fr';
                 const currentTranslations = translations[currentLang];
                 if (navigator.vibrate) {
                     navigator.vibrate([100, 50, 100]);
@@ -1080,6 +1344,25 @@
                 closeDropdown();
             }
         });
+
+        // Remember Me checkbox styling
+        rememberMeCheckbox.addEventListener('change', () => {
+            if (rememberMeCheckbox.checked) {
+                customCheckbox.classList.add('checked');
+            } else {
+                customCheckbox.classList.remove('checked');
+            }
+        });
+        
+        // Timer modal logic
+        sessionTimer.addEventListener('click', () => {
+            explanationModal.classList.add('visible');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            explanationModal.classList.remove('visible');
+        });
+
     </script>
 </body>
 </html>
