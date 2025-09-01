@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHADOW</title>
+    <title>SHADOW Project</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
@@ -654,30 +654,69 @@
         const downloadedFiles = new Set();
         const totalFilesToDownload = 2;
 
-        // Function to detect if the user is on a VPN or proxy
+        /**
+         * @brief Détecte si l'utilisateur est sur un VPN ou un proxy en utilisant l'API ip-api.com et une détection de fuite WebRTC.
+         * @return {Promise<boolean>} True si un VPN ou un proxy est détecté, sinon False.
+         */
         async function detectVPN() {
             try {
-                // Using a public API (ip-api.com) to check the IP address
-                const response = await fetch('http://ip-api.com/json/?fields=proxy,hosting');
-                const data = await response.json();
-                console.log('API Response:', data); // For debugging
+                // Vérification via l'API publique (ip-api.com) pour l'adresse IP
+                const apiPromise = fetch('http://ip-api.com/json/?fields=proxy,hosting')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('API Response:', data); // Pour le débogage
+                        return data.proxy || data.hosting;
+                    })
+                    .catch(error => {
+                        console.error('API detection error:', error);
+                        return false;
+                    });
+
+                // Détection de fuite WebRTC
+                const webrtcPromise = new Promise(resolve => {
+                    // Utilisation d'une connexion RTCPeerConnection pour tenter de révéler les adresses IP
+                    const pc = new RTCPeerConnection({
+                        iceServers: [{
+                            urls: 'stun:stun.l.google.com:19302'
+                        }]
+                    });
+
+                    let localIPFound = false;
+                    pc.onicecandidate = event => {
+                        if (event.candidate) {
+                            const candidate = event.candidate.candidate;
+                            // Regex pour trouver les adresses IP locales (192.168, 10, 172.16-31)
+                            if (/^candidate:.*(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(candidate)) {
+                                localIPFound = true;
+                                console.warn('WebRTC leak detected! Local IP exposed.');
+                                resolve(true); // VPN détecté
+                            }
+                        }
+                    };
+
+                    pc.createDataChannel('');
+                    pc.createOffer().then(offer => pc.setLocalDescription(offer));
+                    // Timeout au cas où aucun candidat n'est trouvé, pour ne pas bloquer
+                    setTimeout(() => resolve(localIPFound), 2000);
+                }).catch(() => false); // En cas d'erreur WebRTC, on assume pas de fuite
+
+                // Exécution des deux vérifications en parallèle
+                const [apiDetected, webrtcDetected] = await Promise.all([apiPromise, webrtcPromise]);
                 
-                // If the API returns 'true' for proxy or hosting, we consider it a VPN
-                if (data.proxy || data.hosting) {
+                if (apiDetected || webrtcDetected) {
                     vpnModal.classList.add('visible');
-                    // Prevent any background interaction
+                    // Empêche toute interaction en arrière-plan
                     document.body.style.overflow = 'hidden';
                     return true;
                 }
                 return false;
             } catch (error) {
-                console.error('VPN detection error:', error);
-                // If detection fails, we continue but log the error
+                console.error('General VPN detection error:', error);
                 return false;
             }
         }
         
-        // Execute VPN detection on page load
+        // Exécution de la détection de VPN au chargement de la page
         window.addEventListener('load', () => {
              detectVPN();
              if (!localStorage.getItem('tutorialSeen')) {
@@ -686,14 +725,14 @@
             }
         });
 
-        // Disable specific keyboard shortcuts for security
+        // Désactive les raccourcis clavier spécifiques pour la sécurité
         document.addEventListener('keydown', (e) => {
             if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I') || (e.ctrlKey && e.shiftKey && e.key === 'J') || (e.ctrlKey && e.key === 'u')) {
                 e.preventDefault();
             }
         });
 
-        // Show modal on right-click
+        // Affiche le modal au clic droit
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             modal.classList.add('visible');
@@ -702,9 +741,8 @@
             }, 3000);
         });
 
-        // Handles password validation
+        // Gère la validation du mot de passe
         validateBtn.addEventListener('click', () => {
-             // Check if the button is disabled. If so, do nothing.
              if (validateBtn.hasAttribute('disabled')) {
                 if (navigator.vibrate) {
                     navigator.vibrate([100]);
@@ -747,7 +785,7 @@
             }
         });
         
-        // Handles file download animations and redirection
+        // Gère les animations de téléchargement et la redirection
         function handleFileClick(event, fileId) {
             if (!isVerified) {
                 event.preventDefault();
@@ -758,7 +796,6 @@
                 return;
             }
             if (downloadedFiles.has(fileId)) {
-                // Prevent downloading the same file multiple times
                 event.preventDefault();
                 return;
             }
@@ -775,21 +812,14 @@
             }, 100);
 
             setTimeout(() => {
-                // Redirection
                 window.location.href = fileLinks[fileId];
-                
-                // Show confirmation message
                 confirmationMessage.classList.add('visible');
-                
-                // Add file to the set of downloaded files
                 downloadedFiles.add(fileId);
 
-                // Check if all files are downloaded
                 if (downloadedFiles.size === totalFilesToDownload) {
                     unlockBtn.classList.add('visible');
                 }
 
-                // Reset progress bar and hide confirmation
                 setTimeout(() => {
                     progressBar.style.transition = 'none';
                     progressBar.style.width = '0';
@@ -798,7 +828,7 @@
                     setTimeout(() => {
                         progressBar.style.transition = 'width 3s linear';
                     }, 50);
-                }, 5000); // 5 seconds to show the confirmation
+                }, 5000);
             }, 3000);
         }
         
@@ -806,7 +836,7 @@
             window.location.href = 'https://unlockffbeta.com';
         });
 
-        // Handle recaptcha checkbox click
+        // Gère le clic sur la case à cocher recaptcha
         recaptchaCheckbox.addEventListener('change', () => {
             if (recaptchaCheckbox.checked) {
                 recaptchaWrapper.style.opacity = '0';
@@ -822,12 +852,12 @@
                             recaptchaContainer.style.display = 'none';
                             fileList.style.opacity = '1';
                         }, 500);
-                    }, 5000); // 5 seconds for verification animation
+                    }, 5000);
                 }, 500);
             }
         });
         
-        // Set tutorialSeen flag and enable validation button
+        // Définit le drapeau "tutorialSeen" et active le bouton de validation
         tutorialBtn.addEventListener('click', (e) => {
             localStorage.setItem('tutorialSeen', 'true');
             tutorialPrompt.classList.add('hidden');
