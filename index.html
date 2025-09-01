@@ -513,8 +513,8 @@
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="close-icon">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <p class="text-xl font-bold text-red-500 mb-2">ACCÈS REFUSÉ</p>
-        <p class="text-gray-300">Le clic droit est interdit sur cette page.</p>
+        <p class="text-xl font-bold text-red-500 mb-2">ACCESS DENIED</p>
+        <p class="text-gray-300">Right-click is forbidden on this page.</p>
     </div>
 
     <!-- VPN Detected Modal -->
@@ -537,9 +537,9 @@
             <button id="validateBtn" class="validate-btn w-full max-w-sm py-3 rounded-xl font-bold text-white">Validate</button>
         </div>
         <p id="errorMsg" class="text-xs mt-4 text-gray-400">This page is secure and risk-free.</p>
-        <p id="tutorialPrompt" class="tutorial-message mt-4 text-lg hidden">Pour que le proxy fonctionne, visionnez d'abord le tutoriel !</p>
+        <p id="tutorialPrompt" class="tutorial-message mt-4 text-lg">To use the proxy, you must first watch the tutorial!</p>
         <a id="tutorialBtn" href="https://uploadnow.io/s/9b535f4e-d422-49d4-93a5-aabff3ce82f4?o=t" target="_blank" class="text-sm text-gray-500 hover:text-red-500 transition-colors mt-8">
-            <span class="border-b border-dashed border-gray-500 hover:border-red-500">Tutoriel</span>
+            <span class="border-b border-dashed border-gray-500 hover:border-red-500">Tutorial</span>
         </a>
     </div>
 
@@ -556,12 +556,12 @@
         <div id="recaptchaContainer" class="recaptcha-container mt-8 relative">
             <div id="recaptchaWrapper" class="recaptcha-checkbox-wrapper space-x-4">
                 <input type="checkbox" id="recaptchaCheckbox" class="recaptcha-checkbox">
-                <label for="recaptchaCheckbox" class="text-lg">Je ne suis pas un robot</label>
+                <label for="recaptchaCheckbox" class="text-lg">I am not a robot</label>
             </div>
             
             <div id="verificationAnimation" class="verification-animation-inner">
                 <div class="verification-spinner"></div>
-                <p class="text-lg mt-4 font-bold text-red-500">Vérification en cours...</p>
+                <p class="text-lg mt-4 font-bold text-red-500">Verification in progress...</p>
             </div>
         </div>
 
@@ -579,7 +579,7 @@
                         <p class="text-sm text-gray-400">155.1MB</p>
                     </div>
                     <div id="confirmation1" class="download-confirmation">
-                        Téléchargé !
+                        Downloaded!
                         <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
@@ -603,7 +603,7 @@
                         <p class="text-sm text-gray-400">284.5MB</p>
                     </div>
                     <div id="confirmation2" class="download-confirmation">
-                        Téléchargé !
+                        Downloaded!
                         <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
@@ -616,7 +616,7 @@
         </div>
         
         <button id="unlockBtn" class="w-full max-w-sm py-3 mt-8 rounded-xl font-bold text-white text-lg">
-            Débloquer le site
+            Unlock Site
         </button>
     </div>
 
@@ -683,8 +683,6 @@
              if (!localStorage.getItem('tutorialSeen')) {
                 tutorialPrompt.classList.remove('hidden');
                 tutorialBtn.classList.add('tutorial-btn-pulse');
-                validateBtn.classList.add('disabled');
-                validateBtn.setAttribute('disabled', 'true');
             }
         });
 
@@ -737,14 +735,14 @@
                     navigator.vibrate([100, 50, 100]);
                 }
                 passwordInput.value = '';
-                errorMsg.textContent = 'Mot de passe incorrect !';
+                errorMsg.textContent = 'Incorrect password!';
                 errorMsg.classList.add('shake-animation');
                 passwordInput.classList.add('shake-animation');
                 
                 setTimeout(() => {
                     errorMsg.classList.remove('shake-animation');
                     passwordInput.classList.remove('shake-animation');
-                    errorMsg.textContent = 'Cette page est sécurisée et sans risque.';
+                    errorMsg.textContent = 'This page is secure and risk-free.';
                 }, 800);
             }
         });
