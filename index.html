@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHADOW</title>
+    <title>SHADOW Project</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
@@ -34,7 +34,7 @@
             width: 100%;
             max-width: 600px;
             text-align: center;
-            transition: opacity 1s ease-out;
+            transition: opacity 1s ease-out, transform 1s ease-out;
         }
 
         .login-container {
@@ -263,10 +263,12 @@
         
         .fade-out {
             opacity: 0;
+            transform: scale(0.95);
         }
 
         .fade-in {
             opacity: 1;
+            transform: scale(1);
         }
         
         @keyframes shake {
@@ -477,6 +479,7 @@
             border-radius: 9999px;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
         }
         .lang-button:hover {
             background-color: #8b0000;
@@ -507,6 +510,7 @@
             border-radius: 0.75rem;
             cursor: pointer;
             transition: background-color 0.2s ease, transform 0.2s ease;
+            position: relative;
         }
         .lang-option:hover {
             background-color: rgba(139, 0, 0, 0.8);
@@ -518,6 +522,18 @@
         }
         .language-icon {
             margin-right: 0.5rem;
+        }
+        
+        .selected-lang-indicator {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background-color: red;
+            border-radius: 50%;
+            border: 1px solid white;
         }
 
     </style>
@@ -544,6 +560,15 @@
             </div>
             <div class="lang-option" data-lang="zh">
                 <span class="language-icon">&#x1F1E8;&#x1F1F3;</span>中文
+            </div>
+            <div class="lang-option" data-lang="ru">
+                <span class="language-icon">&#x1F1F7;&#x1F1FA;</span>Русский
+            </div>
+            <div class="lang-option" data-lang="ja">
+                <span class="language-icon">&#x1F1EF;&#x1F1F5;</span>日本語
+            </div>
+            <div class="lang-option" data-lang="hi">
+                <span class="language-icon">&#x1F1EE;&#x1F1F3;</span>हिन्दी
             </div>
         </div>
     </div>
@@ -745,6 +770,60 @@
                 'modal-title': '访问被拒绝',
                 'modal-text': '禁止在此页面上右键单击。',
                 'currentLangLabel': '中文'
+            },
+            'ru': {
+                'login-title': 'SHADOW',
+                'passwordInput-placeholder': 'Введите пароль',
+                'validateBtn': 'Подтвердить',
+                'errorMsg-correct': 'Эта страница безопасна и безрисковая.',
+                'errorMsg-incorrect': 'Неправильный пароль!',
+                'tutorialPrompt': 'Чтобы использовать прокси, вы должны сначала посмотреть руководство!',
+                'tutorialLinkText': 'Руководство',
+                'loadingText': 'Загрузка...',
+                'recaptchaLabel': 'Я не робот',
+                'verificationText': 'Проверка в процессе...',
+                'confirmation1': 'Загружено!',
+                'confirmation2': 'Загружено!',
+                'unlockBtn': 'Разблокировать сайт',
+                'modal-title': 'ДОСТУП ЗАПРЕЩЕН',
+                'modal-text': 'Правая кнопка мыши запрещена на этой странице.',
+                'currentLangLabel': 'Русский'
+            },
+            'ja': {
+                'login-title': 'SHADOW',
+                'passwordInput-placeholder': 'パスワードを入力',
+                'validateBtn': '検証',
+                'errorMsg-correct': 'このページは安全でリスクフリーです。',
+                'errorMsg-incorrect': 'パスワードが正しくありません！',
+                'tutorialPrompt': 'プロキシを使用するには、まずチュートリアルを見る必要があります！',
+                'tutorialLinkText': 'チュートリアル',
+                'loadingText': '読み込み中...',
+                'recaptchaLabel': '私はロボットではありません',
+                'verificationText': '検証中...',
+                'confirmation1': 'ダウンロード済み！',
+                'confirmation2': 'ダウンロード済み！',
+                'unlockBtn': 'サイトをアンロック',
+                'modal-title': 'アクセスが拒否されました',
+                'modal-text': 'このページでの右クリックは禁止されています。',
+                'currentLangLabel': '日本語'
+            },
+            'hi': {
+                'login-title': 'SHADOW',
+                'passwordInput-placeholder': 'पासवर्ड दर्ज करें',
+                'validateBtn': 'मान्य करें',
+                'errorMsg-correct': 'यह पृष्ठ सुरक्षित और जोखिम-मुक्त है।',
+                'errorMsg-incorrect': 'गलत पासवर्ड!',
+                'tutorialPrompt': 'प्रॉक्सी का उपयोग करने के लिए, आपको पहले ट्यूटोरियल देखना होगा!',
+                'tutorialLinkText': 'ट्यूटोरियल',
+                'loadingText': 'लोड हो रहा है...',
+                'recaptchaLabel': 'मैं रोबोट नहीं हूँ',
+                'verificationText': 'सत्यापन प्रगति पर है...',
+                'confirmation1': 'डाउनलोड किया गया!',
+                'confirmation2': 'डाउनलोड किया गया!',
+                'unlockBtn': 'साइट अनलॉक करें',
+                'modal-title': 'पहुंच अस्वीकृत',
+                'modal-text': 'इस पृष्ठ पर राइट-क्लिक निषिद्ध है।',
+                'currentLangLabel': 'हिन्दी'
             }
         };
 
@@ -778,8 +857,8 @@
         let isVerified = false;
         const downloadedFiles = new Set();
         const totalFilesToDownload = 2;
+        let dropdownTimeout;
 
-        // Function to set the language
         function setLanguage(lang) {
             const currentTranslations = translations[lang];
             if (!currentTranslations) return;
@@ -800,7 +879,21 @@
             document.getElementById('modal-text').textContent = currentTranslations['modal-text'];
             document.getElementById('currentLangLabel').textContent = currentTranslations['currentLangLabel'];
             
-            // Save language to localStorage
+            // Handle selected language indicator
+            langOptions.forEach(option => {
+                option.classList.remove('selected');
+                const indicator = option.querySelector('.selected-lang-indicator');
+                if (indicator) {
+                    indicator.remove();
+                }
+            });
+            const selectedOption = document.querySelector(`.lang-option[data-lang="${lang}"]`);
+            if (selectedOption) {
+                const indicator = document.createElement('span');
+                indicator.classList.add('selected-lang-indicator');
+                selectedOption.appendChild(indicator);
+            }
+
             localStorage.setItem('lang', lang);
         }
 
@@ -958,22 +1051,33 @@
         file2.addEventListener('click', (event) => handleFileClick(event, 'file2'));
 
         // Language menu logic
-        langBtn.addEventListener('click', () => {
+        function closeDropdown() {
+            langDropdown.classList.remove('visible');
+            clearTimeout(dropdownTimeout);
+        }
+
+        langBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
             langDropdown.classList.toggle('visible');
+            if (langDropdown.classList.contains('visible')) {
+                clearTimeout(dropdownTimeout);
+                dropdownTimeout = setTimeout(() => {
+                    closeDropdown();
+                }, 8000);
+            }
         });
 
         langOptions.forEach(option => {
-            option.addEventListener('click', () => {
+            option.addEventListener('click', (event) => {
                 const lang = option.getAttribute('data-lang');
                 setLanguage(lang);
-                langDropdown.classList.remove('visible');
+                closeDropdown();
             });
         });
 
-        // Close dropdown if user clicks outside
         document.addEventListener('click', (event) => {
             if (!langBtn.contains(event.target) && !langDropdown.contains(event.target)) {
-                langDropdown.classList.remove('visible');
+                closeDropdown();
             }
         });
     </script>
