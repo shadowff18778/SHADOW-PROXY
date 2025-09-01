@@ -572,7 +572,7 @@
             <input type="password" id="passwordInput" placeholder="Enter Password" class="pass-input w-full max-w-sm px-4 py-3 rounded-xl text-center mb-4">
             <button id="validateBtn" class="validate-btn w-full max-w-sm py-3 rounded-xl font-bold text-white">Validate</button>
         </div>
-        <p id="errorMsg" class="text-xs mt-4 text-gray-400">This page is secure and risk-free.</p>
+        <p id="errorMsg" class="text-xs mt-4 text-gray-400">Cette page est sécurisée et sans risque.</p>
         <p id="tutorialPrompt" class="tutorial-message mt-4 text-lg">Pour utiliser le proxy, vous devez d'abord regarder le tutoriel !</p>
         <a id="tutorialBtn" href="https://uploadnow.io/s/9b535f4e-d422-49d4-953d-d0f35661cd7a?o=t" target="_blank" class="text-sm text-gray-500 hover:text-red-500 transition-colors mt-8">
             <span class="border-b border-dashed border-gray-500 hover:border-red-500">Tutoriel</span>
@@ -694,28 +694,56 @@
         const downloadedFiles = new Set();
         const totalFilesToDownload = 2;
         let vpnDetected = false;
+        let vpnCheckIntervalId = null;
 
         /**
-         * @brief Affiche le modal de détection de VPN avec des animations.
+         * @brief Gère la logique de détection et d'affichage du modal VPN
+         */
+        async function handleVpnDetection() {
+            vpnDetected = await detectVPN();
+            if (vpnDetected) {
+                showVpnModal();
+            }
+        }
+
+        /**
+         * @brief Affiche le modal de détection de VPN et commence la vérification en arrière-plan.
          */
         function showVpnModal() {
             vpnModal.classList.remove('hidden');
             vpnModal.classList.add('visible');
-            document.body.style.overflow = 'hidden'; // Empêche le défilement
+            document.body.style.overflow = 'hidden';
             
             setTimeout(() => {
                 vpnModalContent.classList.add('show-content');
             }, 100);
+
+            vpnModalMessage.textContent = 'VPN détecté. Le site attend que vous le désactiviez...';
+            vpnLoadingSpinner.classList.remove('hidden');
+            retryVpnBtn.classList.add('hidden');
+            
+            // Démarrer la vérification automatique toutes les 3 secondes
+            if (vpnCheckIntervalId) {
+                clearInterval(vpnCheckIntervalId);
+            }
+            vpnCheckIntervalId = setInterval(async () => {
+                const isVpnStillDetected = await detectVPN();
+                if (!isVpnStillDetected) {
+                    hideVpnModalAndProceed();
+                }
+            }, 3000);
         }
 
         /**
          * @brief Cache le modal de détection de VPN et permet à l'utilisateur de continuer.
          */
         function hideVpnModalAndProceed() {
+            if (vpnCheckIntervalId) {
+                clearInterval(vpnCheckIntervalId);
+            }
             vpnModalContent.classList.remove('show-content');
             vpnModal.classList.remove('visible');
             document.body.style.overflow = '';
-            // Permet l'interaction avec le reste de la page
             loginPage.style.pointerEvents = 'auto';
             mainPage.style.pointerEvents = 'auto';
         }
@@ -740,18 +768,14 @@
 
                 // Détection de fuite WebRTC
                 const webrtcPromise = new Promise(resolve => {
-                    // Utilisation d'une connexion RTCPeerConnection pour tenter de révéler les adresses IP
                     const pc = new RTCPeerConnection({
-                        iceServers: [{
-                            urls: 'stun:stun.l.google.com:19302'
-                        }]
+                        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
                     });
 
                     let localIPFound = false;
                     pc.onicecandidate = event => {
                         if (event.candidate) {
                             const candidate = event.candidate.candidate;
-                            // Regex pour trouver les adresses IP locales (192.168, 10, 172.16-31)
                             if (/^candidate:.*(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(candidate)) {
                                 localIPFound = true;
                                 console.warn('WebRTC leak detected! Local IP exposed.');
@@ -759,14 +783,11 @@
                             }
                         }
                     };
-
                     pc.createDataChannel('');
                     pc.createOffer().then(offer => pc.setLocalDescription(offer));
-                    // Timeout au cas où aucun candidat n'est trouvé, pour ne pas bloquer
                     setTimeout(() => resolve(localIPFound), 2000);
-                }).catch(() => false); // En cas d'erreur WebRTC, on assume pas de fuite
+                }).catch(() => false);
 
-                // Exécution des deux vérifications en parallèle
                 const [apiDetected, webrtcDetected] = await Promise.all([apiPromise, webrtcPromise]);
                 
                 return apiDetected || webrtcDetected;
@@ -777,11 +798,8 @@
         }
         
         // Exécution de la détection de VPN au chargement de la page
-        window.addEventListener('load', async () => {
-            vpnDetected = await detectVPN();
-            if (vpnDetected) {
-                showVpnModal();
-            }
+        window.addEventListener('load', () => {
+            handleVpnDetection();
 
             if (!localStorage.getItem('tutorialSeen')) {
                 tutorialPrompt.classList.remove('hidden');
@@ -795,6 +813,11 @@
             vpnLoadingSpinner.classList.remove('hidden');
             retryVpnBtn.classList.add('hidden');
             
+            // Arrêter l'intervalle actuel pour éviter les doubles vérifications
+            if (vpnCheckIntervalId) {
+                clearInterval(vpnCheckIntervalId);
+            }
+            
             const isVpnStillDetected = await detectVPN();
             
             if (!isVpnStillDetected) {
@@ -804,7 +827,14 @@
                     hideVpnModalAndProceed();
                 }, 1500);
             } else {
-                vpnModalMessage.textContent = 'Accès refusé. Veuillez désactiver votre VPN pour continuer.';
+                vpnModalMessage.textContent = 'VPN détecté. Le site attend que vous le désactiviez...';
+                // Relancer l'intervalle de vérification
+                vpnCheckIntervalId = setInterval(async () => {
+                    const isVpnStillDetected = await detectVPN();
+                    if (!isVpnStillDetected) {
+                        hideVpnModalAndProceed();
+                    }
+                }, 3000);
             }
 
             vpnLoadingSpinner.classList.add('hidden');
@@ -843,6 +873,10 @@
         
             if (passwordInput.value === correctPassword) {
                 loginPage.classList.add('fade-out');
+                // Nettoyer l'intervalle si le login est réussi
+                if (vpnCheckIntervalId) {
+                    clearInterval(vpnCheckIntervalId);
+                }
                 setTimeout(() => {
                     loginPage.style.display = 'none';
                     loadingPage.style.display = 'flex';
@@ -930,13 +964,12 @@
         // Gère le clic sur la case à cocher recaptcha
         recaptchaCheckbox.addEventListener('change', async () => {
             if (recaptchaCheckbox.checked) {
-                // Seconde vérification VPN au moment du clic
                 const vpnIsDetected = await detectVPN();
                 if (vpnIsDetected) {
                     vpnDetected = true;
-                    recaptchaCheckbox.checked = false; // Désélectionne la case
+                    recaptchaCheckbox.checked = false;
                     showVpnModal();
-                    return; // Stoppe le processus si un VPN est détecté
+                    return;
                 }
 
                 recaptchaWrapper.style.opacity = '0';
