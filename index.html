@@ -636,9 +636,100 @@
             font-size: 1.5rem;
             font-weight: bold;
         }
+        /* WebView overlay styles */
+        #webview-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #0a0e1a, #0c0b1a);
+            z-index: 300;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 0.8s forwards;
+            padding: 2rem;
+        }
+
+        #webview-overlay.visible {
+            display: flex;
+        }
+        .overlay-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ff4500;
+            text-shadow: 0 0 10px rgba(255, 69, 0, 0.6);
+            margin-bottom: 1rem;
+            animation: pulse-glow 2s infinite;
+        }
+        .overlay-text {
+            font-size: 1.25rem;
+            color: #e4e4e4;
+            max-width: 500px;
+            margin-bottom: 2rem;
+        }
+        .instruction-box {
+            background-color: rgba(30, 41, 59, 0.7);
+            border: 2px solid #ff4500;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(255, 69, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        .instruction-step {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+        .step-number {
+            background-color: #ff4500;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            margin-right: 1rem;
+        }
+        .highlight {
+            color: #ff4500;
+            font-weight: bold;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 10px rgba(255, 69, 0, 0.6); }
+            50% { transform: scale(1.05); text-shadow: 0 0 20px rgba(255, 69, 0, 0.8); }
+        }
     </style>
 </head>
 <body oncontextmenu="return false;">
+
+    <!-- WebView Overlay -->
+    <div id="webview-overlay">
+        <h1 class="overlay-title" id="overlay-title">Navigation requise</h1>
+        <p class="overlay-text" id="overlay-text">
+            Pour accéder à toutes les fonctionnalités et éviter les erreurs, veuillez ouvrir ce site dans un navigateur web standard.
+        </p>
+        <div class="instruction-box">
+            <div class="instruction-step">
+                <span class="step-number">1</span>
+                <span id="step1-text">Appuyez sur les <span class="highlight">trois points</span> (...) ou sur l'icône de partage dans le coin supérieur.</span>
+            </div>
+            <div class="instruction-step">
+                <span class="step-number">2</span>
+                <span id="step2-text">Sélectionnez <span class="highlight">"Ouvrir dans le navigateur"</span>.</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Language Selection Menu -->
     <div class="language-menu">
@@ -831,7 +922,11 @@
                 'timer-label': 'Session:',
                 'modal-explain-title': 'Extended Session',
                 'modal-explain-text': 'Your session remains open for 12 hours because you checked the "Remember me" option. This is the time remaining before your session closes.',
-                'close-modal-btn': 'Understood'
+                'close-modal-btn': 'Understood',
+                'overlay-title': 'Navigation Required',
+                'overlay-text': 'To access all features and avoid errors, please open this site in a standard web browser.',
+                'step1-text': 'Tap the <span class="highlight">three dots</span> (...) or share icon in the top corner.',
+                'step2-text': 'Select <span class="highlight">"Open in Browser"</span>.'
             },
             'fr': {
                 'login-title': 'SHADOW',
@@ -854,7 +949,11 @@
                 'timer-label': 'Session:',
                 'modal-explain-title': 'Session Prolongée',
                 'modal-explain-text': 'Votre session reste ouverte pendant 12 heures car vous avez coché l\'option "Se souvenir de moi". Ceci est le temps restant avant la fermeture de votre session.',
-                'close-modal-btn': 'Compris'
+                'close-modal-btn': 'Compris',
+                'overlay-title': 'Navigation requise',
+                'overlay-text': 'Pour accéder à toutes les fonctionnalités et éviter les erreurs, veuillez ouvrir ce site dans un navigateur web standard.',
+                'step1-text': 'Appuyez sur les <span class="highlight">trois points</span> (...) ou sur l\'icône de partage dans le coin supérieur.',
+                'step2-text': 'Sélectionnez <span class="highlight">"Ouvrir dans le navigateur"</span>.'
             },
             'it': {
                 'login-title': 'SHADOW',
@@ -877,7 +976,11 @@
                 'timer-label': 'Sessione:',
                 'modal-explain-title': 'Sessione Estesa',
                 'modal-explain-text': 'La tua sessione rimane aperta per 12 ore perché hai selezionato l\'opzione "Ricordami". Questo è il tempo rimanente prima della chiusura della tua sessione.',
-                'close-modal-btn': 'Ho capito'
+                'close-modal-btn': 'Ho capito',
+                'overlay-title': 'Navigazione richiesta',
+                'overlay-text': 'Per accedere a tutte le funzionalità ed evitare errori, apri questo sito in un browser web standard.',
+                'step1-text': 'Tocca i <span class="highlight">tre punti</span> (...) o l\'icona di condivisione nell\'angolo in alto.',
+                'step2-text': 'Seleziona <span class="highlight">"Apri nel browser"</span>.'
             },
             'sq': {
                 'login-title': 'SHADOW',
@@ -900,7 +1003,11 @@
                 'timer-label': 'Sesioni:',
                 'modal-explain-title': 'Sesion i Zgjeruar',
                 'modal-explain-text': 'Sesioni juaj mbetet i hapur për 12 orë sepse keni zgjedhur opsionin "Më mbaj mend". Kjo është koha e mbetur para se sesioni juaj të mbyllet.',
-                'close-modal-btn': 'Kuptuar'
+                'close-modal-btn': 'Kuptuar',
+                'overlay-title': 'Lundrimi i nevojshëm',
+                'overlay-text': 'Për të hyrë në të gjitha funksionet dhe për të shmangur gabimet, ju lutemi hapni këtë faqe në një shfletues standard ueb.',
+                'step1-text': 'Shtypni <span class="highlight">tre pikat</span> (...) ose ikonën e ndarjes në këndin e sipërm.',
+                'step2-text': 'Zgjidhni <span class="highlight">"Hape në shfletues"</span>.'
             },
             'zh': {
                 'login-title': 'SHADOW',
@@ -923,7 +1030,11 @@
                 'timer-label': '会话:',
                 'modal-explain-title': '扩展会话',
                 'modal-explain-text': '由于您勾选了“记住我”选项，您的会话将保持开放12小时。这是会话关闭前的剩余时间。',
-                'close-modal-btn': '知道了'
+                'close-modal-btn': '知道了',
+                'overlay-title': '需要导航',
+                'overlay-text': '要访问所有功能并避免错误，请在标准网页浏览器中打开此网站。',
+                'step1-text': '点击顶部角落的<span class="highlight">三个点</span>（...）或分享图标。',
+                'step2-text': '选择<span class="highlight">“在浏览器中打开”</span>。'
             },
             'ru': {
                 'login-title': 'SHADOW',
@@ -946,7 +1057,11 @@
                 'timer-label': 'Сессия:',
                 'modal-explain-title': 'Продленная сессия',
                 'modal-explain-text': 'Ваша сессия остается открытой в течение 12 часов, потому что вы выбрали опцию "Запомнить меня". Это оставшееся время до закрытия вашей сессии.',
-                'close-modal-btn': 'Понятно'
+                'close-modal-btn': 'Понятно',
+                'overlay-title': 'Требуется навигация',
+                'overlay-text': 'Чтобы получить доступ ко всем функциям и избежать ошибок, откройте этот сайт в стандартном веб-браузере.',
+                'step1-text': 'Нажмите на <span class="highlight">три точки</span> (...) или значок "Поделиться" в верхнем углу.',
+                'step2-text': 'Выберите <span class="highlight">"Открыть в браузере"</span>.'
             },
             'ja': {
                 'login-title': 'SHADOW',
@@ -969,7 +1084,11 @@
                 'timer-label': 'セッション:',
                 'modal-explain-title': '延長セッション',
                 'modal-explain-text': '「私を覚えていますか」オプションをチェックしたため、セッションは12時間開いたままになります。これはセッションが閉じるまでの残り時間です。',
-                'close-modal-btn': '了解'
+                'close-modal-btn': '了解',
+                'overlay-title': 'ナビゲーションが必要です',
+                'overlay-text': 'すべての機能にアクセスし、エラーを回避するために、このサイトを標準のウェブブラウザで開いてください。',
+                'step1-text': '上隅にある<span class="highlight">3つの点</span>（...）または共有アイコンをタップします。',
+                'step2-text': '<span class="highlight">「ブラウザで開く」</span>を選択します。'
             },
             'hi': {
                 'login-title': 'SHADOW',
@@ -992,7 +1111,11 @@
                 'timer-label': 'सत्र:',
                 'modal-explain-title': 'विस्तारित सत्र',
                 'modal-explain-text': 'आपने "मुझे याद रखें" विकल्प को चुना है, इसलिए आपका सत्र 12 घंटे तक खुला रहेगा। यह आपके सत्र के बंद होने से पहले का शेष समय है।',
-                'close-modal-btn': 'समझ गया'
+                'close-modal-btn': 'समझ गया',
+                'overlay-title': 'नेविगेशन की आवश्यकता है',
+                'overlay-text': 'सभी सुविधाओं तक पहुंचने और त्रुटियों से बचने के लिए, कृपया इस साइट को एक मानक वेब ब्राउज़र में खोलें।',
+                'step1-text': 'ऊपरी कोने में <span class="highlight">तीन बिंदुओं</span> (...) या शेयर आइकन पर टैप करें।',
+                'step2-text': '<span class="highlight">"ब्राउज़र में खोलें"</span> चुनें।'
             }
         };
 
@@ -1025,6 +1148,7 @@
         const explanationModal = document.getElementById('explanation-modal');
         const modalCountdown = document.getElementById('modal-countdown');
         const closeModalBtn = document.getElementById('close-modal-btn');
+        const webviewOverlay = document.getElementById('webview-overlay');
 
 
         const correctPassword = 'SHADOW9988';
@@ -1062,6 +1186,10 @@
             document.getElementById('modal-explain-title').textContent = currentTranslations['modal-explain-title'];
             document.getElementById('modal-explain-text').textContent = currentTranslations['modal-explain-text'];
             document.getElementById('close-modal-btn').textContent = currentTranslations['close-modal-btn'];
+            document.getElementById('overlay-title').textContent = currentTranslations['overlay-title'];
+            document.getElementById('overlay-text').textContent = currentTranslations['overlay-text'];
+            document.getElementById('step1-text').innerHTML = currentTranslations['step1-text'];
+            document.getElementById('step2-text').innerHTML = currentTranslations['step2-text'];
         }
 
         function setLanguage(lang) {
@@ -1162,9 +1290,24 @@
             }
         }
 
+        // Function to detect if the page is in a webview
+        function isWebView() {
+            const ua = navigator.userAgent;
+            return /Instagram|FBAN|FBAV|Twitter|TikTok/i.test(ua) || (window.navigator.standalone === false);
+        }
+
         window.addEventListener('load', () => {
             const savedLang = localStorage.getItem('lang') || 'fr';
             setLanguage(savedLang);
+            
+            if (isWebView()) {
+                webviewOverlay.classList.add('visible');
+                // Hide other content
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('loadingPage').style.display = 'none';
+                document.getElementById('mainPage').style.display = 'none';
+                return; // Stop further execution
+            }
 
             if (!localStorage.getItem('tutorialSeen')) {
                 tutorialPrompt.classList.remove('hidden');
