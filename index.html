@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +7,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        :root {
+            --bg-color-start: #0a0e1a;
+            --bg-color-mid: #1f2937;
+            --bg-color-end: #8b0000;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0a0e1a 0%, #1f2937 50%, #8b0000 100%);
+            background: linear-gradient(135deg, var(--bg-color-start) 0%, var(--bg-color-mid) 50%, var(--bg-color-end) 100%);
             background-size: 400% 400%;
             animation: gradient-animation 15s ease infinite;
             color: white;
@@ -636,99 +641,111 @@
             font-size: 1.5rem;
             font-weight: bold;
         }
-        /* WebView overlay styles */
-        #webview-overlay {
+
+        /* New styles for the settings button and modal */
+        #settingsBtn {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, #0a0e1a, #0c0b1a);
-            z-index: 300;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background-color: rgba(30, 41, 59, 0.7);
+            border: 2px solid #8b0000;
+            border-radius: 50%;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 30;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             opacity: 0;
-            animation: fadeIn 0.8s forwards;
-            padding: 2rem;
+            pointer-events: none;
+        }
+        #settingsBtn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #settingsBtn:hover {
+            transform: rotate(90deg) scale(1.1);
+            background-color: #8b0000;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+        }
+        #settingsBtn svg {
+            width: 2rem;
+            height: 2rem;
+            color: white;
         }
 
-        #webview-overlay.visible {
-            display: flex;
-        }
-        .overlay-title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #ff4500;
-            text-shadow: 0 0 10px rgba(255, 69, 0, 0.6);
-            margin-bottom: 1rem;
-            animation: pulse-glow 2s infinite;
-        }
-        .overlay-text {
-            font-size: 1.25rem;
-            color: #e4e4e4;
-            max-width: 500px;
-            margin-bottom: 2rem;
-        }
-        .instruction-box {
-            background-color: rgba(30, 41, 59, 0.7);
-            border: 2px solid #ff4500;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: 0 0 20px rgba(255, 69, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        #settings-modal {
+            position: fixed;
+            bottom: 0;
+            left: 0;
             width: 100%;
-            max-width: 400px;
+            background-color: rgba(15, 23, 42, 0.95);
+            border-top: 2px solid #8b0000;
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 40;
+            padding: 2rem 1.5rem;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.5);
+            border-radius: 1.5rem 1.5rem 0 0;
         }
-        .instruction-step {
-            display: flex;
-            align-items: center;
-            font-weight: bold;
+        #settings-modal.visible {
+            transform: translateY(0);
         }
-        .step-number {
+        .close-settings-btn {
+            background-color: transparent;
+            border: 2px solid #ff4500;
+            color: #ff4500;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .close-settings-btn:hover {
             background-color: #ff4500;
             color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
+        }
+        .color-theme-option {
+            background: #2d3748;
+            border: 2px solid #8b0000;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .color-theme-option:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+        .color-theme-option.selected {
+            border-color: #ff4500;
+            box-shadow: 0 0 10px #ff4500, inset 0 0 10px #ff4500;
+        }
+        .color-circles {
             display: flex;
             justify-content: center;
-            align-items: center;
-            flex-shrink: 0;
-            margin-right: 1rem;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
         }
-        .highlight {
-            color: #ff4500;
-            font-weight: bold;
-        }
-        @keyframes pulse-glow {
-            0%, 100% { transform: scale(1); text-shadow: 0 0 10px rgba(255, 69, 0, 0.6); }
-            50% { transform: scale(1.05); text-shadow: 0 0 20px rgba(255, 69, 0, 0.8); }
+        .color-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid white;
         }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <!-- WebView Overlay -->
-    <div id="webview-overlay">
-        <h1 class="overlay-title" id="overlay-title">Navigation requise</h1>
-        <p class="overlay-text" id="overlay-text">
-            Pour accéder à toutes les fonctionnalités et éviter les erreurs, veuillez ouvrir ce site dans un navigateur web standard.
-        </p>
-        <div class="instruction-box">
-            <div class="instruction-step">
-                <span class="step-number">1</span>
-                <span id="step1-text">Appuyez sur les <span class="highlight">trois points</span> (...) ou sur l'icône de partage dans le coin supérieur.</span>
-            </div>
-            <div class="instruction-step">
-                <span class="step-number">2</span>
-                <span id="step2-text">Sélectionnez <span class="highlight">"Ouvrir dans le navigateur"</span>.</span>
-            </div>
-        </div>
+    <!-- Stylish modal for right-click -->
+    <div id="access-denied-modal">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="close-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p id="modal-title" class="text-xl font-bold text-red-500 mb-2">ACCÈS REFUSÉ</p>
+        <p id="modal-text" class="text-gray-300">Le clic droit est interdit sur cette page.</p>
     </div>
 
     <!-- Language Selection Menu -->
@@ -765,15 +782,6 @@
         </div>
     </div>
 
-    <!-- Stylish modal for right-click -->
-    <div id="access-denied-modal">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="close-icon">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <p id="modal-title" class="text-xl font-bold text-red-500 mb-2">ACCÈS REFUSÉ</p>
-        <p id="modal-text" class="text-gray-300">Le clic droit est interdit sur cette page.</p>
-    </div>
-
     <!-- Login Page -->
     <div id="loginPage" class="login-container">
         <h1 id="login-title" class="login-title text-3xl sm:text-4xl">SHADOW</h1>
@@ -790,7 +798,7 @@
             <button id="validateBtn" class="validate-btn w-full max-w-sm py-3 rounded-xl font-bold text-white mt-4">Valider</button>
         </div>
         <p id="errorMsg" class="text-xs mt-4 text-gray-400">Cette page est sécurisée et sans risque.</p>
-        <p id="tutorialPrompt" class="tutorial-message mt-4 text-lg">Pour utiliser le proxy, vous devez d'abord regarder le tutoriel !</p>
+        <p id="tutorialPrompt" class="tutorial-message mt-4 text-lg hidden">Pour utiliser le proxy, vous devez d'abord regarder le tutoriel !</p>
         <a id="tutorialBtn" href="https://sendvid.com/ntvfknq3" target="_blank" class="text-sm text-gray-500 hover:text-red-500 transition-colors mt-8">
             <span id="tutorialLinkText" class="border-b border-dashed border-gray-500 hover:border-red-500">Tutoriel</span>
         </a>
@@ -898,6 +906,77 @@
             </button>
         </div>
     </div>
+    
+    <!-- Settings Button (New) -->
+    <button id="settingsBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+    </button>
+    
+    <!-- Settings Modal (New) -->
+    <div id="settings-modal">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold">Options d'apparence</h2>
+            <button id="closeSettingsBtn" class="close-settings-btn">
+                Fermer
+            </button>
+        </div>
+        <p class="text-sm text-gray-400 mb-4">
+            Changez le thème de couleur du fond.
+        </p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <!-- Theme 1: Default -->
+            <div class="color-theme-option selected" data-theme="default">
+                <div class="color-circles">
+                    <div class="color-circle" style="background-color: #0a0e1a;"></div>
+                    <div class="color-circle" style="background-color: #8b0000;"></div>
+                </div>
+                <span class="text-sm font-semibold">Défaut</span>
+            </div>
+            <!-- Theme 2: Purple/Green -->
+            <div class="color-theme-option" data-theme="purple-green">
+                <div class="color-circles">
+                    <div class="color-circle" style="background-color: #3f005d;"></div>
+                    <div class="color-circle" style="background-color: #008000;"></div>
+                </div>
+                <span class="text-sm font-semibold">Violet/Vert</span>
+            </div>
+            <!-- Theme 3: Blue/Teal -->
+            <div class="color-theme-option" data-theme="blue-teal">
+                <div class="color-circles">
+                    <div class="color-circle" style="background-color: #00008b;"></div>
+                    <div class="color-circle" style="background-color: #008080;"></div>
+                </div>
+                <span class="text-sm font-semibold">Bleu/Sarcelle</span>
+            </div>
+            <!-- Theme 4: Orange/Yellow -->
+            <div class="color-theme-option" data-theme="orange-yellow">
+                <div class="color-circles">
+                    <div class="color-circle" style="background-color: #ff4500;"></div>
+                    <div class="color-circle" style="background-color: #ffd700;"></div>
+                </div>
+                <span class="text-sm font-semibold">Orange/Jaune</span>
+            </div>
+            <!-- Theme 5: Pink/Red -->
+            <div class="color-theme-option" data-theme="pink-red">
+                <div class="color-circles">
+                    <div class="color-circle" style="background-color: #ff1493;"></div>
+                    <div class="color-circle" style="background-color: #ff0000;"></div>
+                </div>
+                <span class="text-sm font-semibold">Rose/Rouge</span>
+            </div>
+            <!-- Theme 6: Yellow/Black -->
+            <div class="color-theme-option" data-theme="yellow-black">
+                <div class="color-circles">
+                    <div class="color-circle" style="background-color: #ffd700;"></div>
+                    <div class="color-circle" style="background-color: #000000;"></div>
+                </div>
+                <span class="text-sm font-semibold">Jaune/Noir</span>
+            </div>
+        </div>
+    </div>
 
     <script>
         const translations = {
@@ -923,10 +1002,15 @@
                 'modal-explain-title': 'Extended Session',
                 'modal-explain-text': 'Your session remains open for 12 hours because you checked the "Remember me" option. This is the time remaining before your session closes.',
                 'close-modal-btn': 'Understood',
-                'overlay-title': 'Navigation Required',
-                'overlay-text': 'To access all features and avoid errors, please open this site in a standard web browser.',
-                'step1-text': 'Tap the <span class="highlight">three dots</span> (...) or share icon in the top corner.',
-                'step2-text': 'Select <span class="highlight">"Open in Browser"</span>.'
+                'settings-title': 'Appearance Options',
+                'settings-desc': 'Change the background color theme.',
+                'settings-default': 'Default',
+                'settings-purple-green': 'Purple/Green',
+                'settings-blue-teal': 'Blue/Teal',
+                'settings-orange-yellow': 'Orange/Yellow',
+                'settings-pink-red': 'Pink/Red',
+                'settings-yellow-black': 'Yellow/Black',
+                'close-settings-btn': 'Close'
             },
             'fr': {
                 'login-title': 'SHADOW',
@@ -950,10 +1034,15 @@
                 'modal-explain-title': 'Session Prolongée',
                 'modal-explain-text': 'Votre session reste ouverte pendant 12 heures car vous avez coché l\'option "Se souvenir de moi". Ceci est le temps restant avant la fermeture de votre session.',
                 'close-modal-btn': 'Compris',
-                'overlay-title': 'Navigation requise',
-                'overlay-text': 'Pour accéder à toutes les fonctionnalités et éviter les erreurs, veuillez ouvrir ce site dans un navigateur web standard.',
-                'step1-text': 'Appuyez sur les <span class="highlight">trois points</span> (...) ou sur l\'icône de partage dans le coin supérieur.',
-                'step2-text': 'Sélectionnez <span class="highlight">"Ouvrir dans le navigateur"</span>.'
+                'settings-title': 'Options d\'apparence',
+                'settings-desc': 'Changez le thème de couleur du fond.',
+                'settings-default': 'Défaut',
+                'settings-purple-green': 'Violet/Vert',
+                'settings-blue-teal': 'Bleu/Sarcelle',
+                'settings-orange-yellow': 'Orange/Jaune',
+                'settings-pink-red': 'Rose/Rouge',
+                'settings-yellow-black': 'Jaune/Noir',
+                'close-settings-btn': 'Fermer'
             },
             'it': {
                 'login-title': 'SHADOW',
@@ -977,10 +1066,15 @@
                 'modal-explain-title': 'Sessione Estesa',
                 'modal-explain-text': 'La tua sessione rimane aperta per 12 ore perché hai selezionato l\'opzione "Ricordami". Questo è il tempo rimanente prima della chiusura della tua sessione.',
                 'close-modal-btn': 'Ho capito',
-                'overlay-title': 'Navigazione richiesta',
-                'overlay-text': 'Per accedere a tutte le funzionalità ed evitare errori, apri questo sito in un browser web standard.',
-                'step1-text': 'Tocca i <span class="highlight">tre punti</span> (...) o l\'icona di condivisione nell\'angolo in alto.',
-                'step2-text': 'Seleziona <span class="highlight">"Apri nel browser"</span>.'
+                'settings-title': 'Opzioni di aspetto',
+                'settings-desc': 'Cambia il tema di colore dello sfondo.',
+                'settings-default': 'Predefinito',
+                'settings-purple-green': 'Viola/Verde',
+                'settings-blue-teal': 'Blu/Acqua',
+                'settings-orange-yellow': 'Arancione/Giallo',
+                'settings-pink-red': 'Rosa/Rosso',
+                'settings-yellow-black': 'Giallo/Nero',
+                'close-settings-btn': 'Chiudi'
             },
             'sq': {
                 'login-title': 'SHADOW',
@@ -1004,10 +1098,15 @@
                 'modal-explain-title': 'Sesion i Zgjeruar',
                 'modal-explain-text': 'Sesioni juaj mbetet i hapur për 12 orë sepse keni zgjedhur opsionin "Më mbaj mend". Kjo është koha e mbetur para se sesioni juaj të mbyllet.',
                 'close-modal-btn': 'Kuptuar',
-                'overlay-title': 'Lundrimi i nevojshëm',
-                'overlay-text': 'Për të hyrë në të gjitha funksionet dhe për të shmangur gabimet, ju lutemi hapni këtë faqe në një shfletues standard ueb.',
-                'step1-text': 'Shtypni <span class="highlight">tre pikat</span> (...) ose ikonën e ndarjes në këndin e sipërm.',
-                'step2-text': 'Zgjidhni <span class="highlight">"Hape në shfletues"</span>.'
+                'settings-title': 'Opsionet e pamjes',
+                'settings-desc': 'Ndryshoni temën e ngjyrës së sfondit.',
+                'settings-default': 'Paracaktuar',
+                'settings-purple-green': 'Vjollcë/Gjelbër',
+                'settings-blue-teal': 'Blu/Hirtë',
+                'settings-orange-yellow': 'Portokalli/Verdhë',
+                'settings-pink-red': 'Rozë/Kuqe',
+                'settings-yellow-black': 'Verdhë/Zezë',
+                'close-settings-btn': 'Mbyll'
             },
             'zh': {
                 'login-title': 'SHADOW',
@@ -1031,10 +1130,15 @@
                 'modal-explain-title': '扩展会话',
                 'modal-explain-text': '由于您勾选了“记住我”选项，您的会话将保持开放12小时。这是会话关闭前的剩余时间。',
                 'close-modal-btn': '知道了',
-                'overlay-title': '需要导航',
-                'overlay-text': '要访问所有功能并避免错误，请在标准网页浏览器中打开此网站。',
-                'step1-text': '点击顶部角落的<span class="highlight">三个点</span>（...）或分享图标。',
-                'step2-text': '选择<span class="highlight">“在浏览器中打开”</span>。'
+                'settings-title': '外观选项',
+                'settings-desc': '更改背景颜色主题。',
+                'settings-default': '默认',
+                'settings-purple-green': '紫色/绿色',
+                'settings-blue-teal': '蓝色/蓝绿色',
+                'settings-orange-yellow': '橙色/黄色',
+                'settings-pink-red': '粉红色/红色',
+                'settings-yellow-black': '黄色/黑色',
+                'close-settings-btn': '关闭'
             },
             'ru': {
                 'login-title': 'SHADOW',
@@ -1058,10 +1162,15 @@
                 'modal-explain-title': 'Продленная сессия',
                 'modal-explain-text': 'Ваша сессия остается открытой в течение 12 часов, потому что вы выбрали опцию "Запомнить меня". Это оставшееся время до закрытия вашей сессии.',
                 'close-modal-btn': 'Понятно',
-                'overlay-title': 'Требуется навигация',
-                'overlay-text': 'Чтобы получить доступ ко всем функциям и избежать ошибок, откройте этот сайт в стандартном веб-браузере.',
-                'step1-text': 'Нажмите на <span class="highlight">три точки</span> (...) ou значок "Поделиться" в верхнем углу.',
-                'step2-text': 'Выберите <span class="highlight">"Открыть в браузере"</span>.'
+                'settings-title': 'Параметры внешнего вида',
+                'settings-desc': 'Измените цветовую тему фона.',
+                'settings-default': 'По умолчанию',
+                'settings-purple-green': 'Фиолетовый/Зеленый',
+                'settings-blue-teal': 'Синий/Бирюзовый',
+                'settings-orange-yellow': 'Оранжевый/Желтый',
+                'settings-pink-red': 'Розовый/Красный',
+                'settings-yellow-black': 'Желтый/Черный',
+                'close-settings-btn': 'Закрыть'
             },
             'ja': {
                 'login-title': 'SHADOW',
@@ -1085,10 +1194,15 @@
                 'modal-explain-title': '延長セッション',
                 'modal-explain-text': '「私を覚えていますか」オプションをチェックしたため、セッションは12時間開いたままになります。これはセッションが閉じるまでの残り時間です。',
                 'close-modal-btn': '了解',
-                'overlay-title': 'ナビゲーションが必要です',
-                'overlay-text': 'すべての機能にアクセスし、エラーを回避するために、このサイトを標準のウェブブラウザで開いてください。',
-                'step1-text': '上隅にある<span class="highlight">3つの点</span>（...）または共有アイコンをタップします。',
-                'step2-text': '<span class="highlight">「ブラウザで開く」</span>を選択します。'
+                'settings-title': '外観オプション',
+                'settings-desc': '背景色テーマを変更します。',
+                'settings-default': 'デフォルト',
+                'settings-purple-green': '紫/緑',
+                'settings-blue-teal': '青/ティール',
+                'settings-orange-yellow': 'オレンジ/黄色',
+                'settings-pink-red': 'ピンク/赤',
+                'settings-yellow-black': '黄/黒',
+                'close-settings-btn': '閉じる'
             },
             'hi': {
                 'login-title': 'SHADOW',
@@ -1112,10 +1226,15 @@
                 'modal-explain-title': 'विस्तारित सत्र',
                 'modal-explain-text': 'आपने "मुझे याद रखें" विकल्प को चुना है, इसलिए आपका सत्र 12 घंटे तक खुला रहेगा। यह आपके सत्र के बंद होने से पहले का शेष समय है।',
                 'close-modal-btn': 'समझ गया',
-                'overlay-title': 'नेविगेशन की आवश्यकता है',
-                'overlay-text': 'सभी सुविधाओं तक पहुंचने और त्रुटियों से बचने के लिए, कृपया इस साइट को एक मानक वेब ब्राउज़र में खोलें।',
-                'step1-text': 'ऊपरी कोने में <span class="highlight">तीन बिंदुओं</span> (...) या शेयर आइकन पर टैप करें।',
-                'step2-text': '<span class="highlight">"ब्राउज़र में खोलें"</span> चुनें।'
+                'settings-title': 'दिखने के विकल्प',
+                'settings-desc': 'पृष्ठभूमि रंग थीम बदलें।',
+                'settings-default': 'डिफ़ॉल्ट',
+                'settings-purple-green': 'बैंगनी/हरा',
+                'settings-blue-teal': 'नीला/टील',
+                'settings-orange-yellow': 'नारंगी/पीला',
+                'settings-pink-red': 'गुलाबी/लाल',
+                'settings-yellow-black': 'पीला/काला',
+                'close-settings-btn': 'बंद करें'
             }
         };
 
@@ -1148,13 +1267,23 @@
         const explanationModal = document.getElementById('explanation-modal');
         const modalCountdown = document.getElementById('modal-countdown');
         const closeModalBtn = document.getElementById('close-modal-btn');
-        const webviewOverlay = document.getElementById('webview-overlay');
-
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsModal = document.getElementById('settings-modal');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        const colorThemeOptions = document.querySelectorAll('.color-theme-option');
 
         const correctPassword = 'SHADOW9988';
         const fileLinks = {
             file1: 'https://download2391.mediafire.com/dumhfgrh5qkgjrt0KVDs677KK0autJYaUHXJ3adJ7CCaTfvBCancsXCzdXH8tXFeQTvroFRBuDbnOjFatk2stpoVOPt4i2dEMkl37YuYT4nRPMg_fHabIKfu4jajBkM1DJmN2peyI2IZHMtZg1ST7pe64c96tUgM87mfGerKj5LGjQ/ozmo2bb32fl7djo/Astute+Beta_2.114.1+%282%29.apk',
             file2: 'https://download2442.mediafire.com/10n3z6ni1hlgeFxFiMcyu9_Q5etKgEfrr5OxjqXUdefN-nU-QF09Kg4lUTqIohyp-7Dy0uq4qHRZW_w98qw_alXJ_ioBllqlXKt8pRAZF3KpN6y1uuJXxSMWFAQa-SH6fZp63yHMRpaWUjUtpNknt7tt5Y8d5W70d7a-Yc701wEh8Q/cs0p62wj7og2ejm/main.2019115651.com.dts.freefiremax.obb'
+        };
+        const colorThemes = {
+            'default': { start: '#0a0e1a', mid: '#1f2937', end: '#8b0000' },
+            'purple-green': { start: '#1d003b', mid: '#3f005d', end: '#008000' },
+            'blue-teal': { start: '#00004d', mid: '#00008b', end: '#008080' },
+            'orange-yellow': { start: '#ff4500', mid: '#ff8c00', end: '#ffd700' },
+            'pink-red': { start: '#ff1493', mid: '#ff69b4', end: '#ff0000' },
+            'yellow-black': { start: '#ffd700', mid: '#ffa500', end: '#000000' }
         };
         let isVerified = false;
         const downloadedFiles = new Set();
@@ -1186,10 +1315,15 @@
             document.getElementById('modal-explain-title').textContent = currentTranslations['modal-explain-title'];
             document.getElementById('modal-explain-text').textContent = currentTranslations['modal-explain-text'];
             document.getElementById('close-modal-btn').textContent = currentTranslations['close-modal-btn'];
-            document.getElementById('overlay-title').textContent = currentTranslations['overlay-title'];
-            document.getElementById('overlay-text').textContent = currentTranslations['overlay-text'];
-            document.getElementById('step1-text').innerHTML = currentTranslations['step1-text'];
-            document.getElementById('step2-text').innerHTML = currentTranslations['step2-text'];
+            document.querySelector('#settings-modal h2').textContent = currentTranslations['settings-title'];
+            document.querySelector('#settings-modal p').textContent = currentTranslations['settings-desc'];
+            document.querySelector('.color-theme-option[data-theme="default"] span').textContent = currentTranslations['settings-default'];
+            document.querySelector('.color-theme-option[data-theme="purple-green"] span').textContent = currentTranslations['settings-purple-green'];
+            document.querySelector('.color-theme-option[data-theme="blue-teal"] span').textContent = currentTranslations['settings-blue-teal'];
+            document.querySelector('.color-theme-option[data-theme="orange-yellow"] span').textContent = currentTranslations['settings-orange-yellow'];
+            document.querySelector('.color-theme-option[data-theme="pink-red"] span').textContent = currentTranslations['settings-pink-red'];
+            document.querySelector('.color-theme-option[data-theme="yellow-black"] span').textContent = currentTranslations['settings-yellow-black'];
+            document.getElementById('closeSettingsBtn').textContent = currentTranslations['close-settings-btn'];
         }
 
         function setLanguage(lang) {
@@ -1250,6 +1384,7 @@
                         mainPage.style.display = 'flex';
                         mainPage.classList.add('fade-in');
                         recaptchaContainer.classList.add('visible');
+                        settingsBtn.classList.add('visible');
                         
                         // Check if remember me was set to start timer
                         if (localStorage.getItem('session_end_time')) {
@@ -1273,6 +1408,7 @@
             passwordInput.value = '';
             rememberMeCheckbox.checked = false;
             customCheckbox.classList.remove('checked');
+            settingsBtn.classList.remove('visible');
         }
 
         function checkSessionOnLoad() {
@@ -1290,24 +1426,31 @@
             }
         }
 
-        // Function to detect if the page is in a webview
-        function isWebView() {
-            const ua = navigator.userAgent;
-            return /Instagram|FBAN|FBAV|Twitter|TikTok/i.test(ua) || (window.navigator.standalone === false);
+        function applyTheme(themeName) {
+            const theme = colorThemes[themeName];
+            if (theme) {
+                document.documentElement.style.setProperty('--bg-color-start', theme.start);
+                document.documentElement.style.setProperty('--bg-color-mid', theme.mid);
+                document.documentElement.style.setProperty('--bg-color-end', theme.end);
+                localStorage.setItem('theme', themeName);
+            }
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'default';
+            applyTheme(savedTheme);
+            colorThemeOptions.forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.theme === savedTheme) {
+                    option.classList.add('selected');
+                }
+            });
         }
 
         window.addEventListener('load', () => {
             const savedLang = localStorage.getItem('lang') || 'fr';
             setLanguage(savedLang);
-            
-            if (isWebView()) {
-                webviewOverlay.classList.add('visible');
-                // Hide other content
-                document.getElementById('loginPage').style.display = 'none';
-                document.getElementById('loadingPage').style.display = 'none';
-                document.getElementById('mainPage').style.display = 'none';
-                return; // Stop further execution
-            }
+            loadTheme();
 
             if (!localStorage.getItem('tutorialSeen')) {
                 tutorialPrompt.classList.remove('hidden');
@@ -1498,6 +1641,24 @@
 
         closeModalBtn.addEventListener('click', () => {
             explanationModal.classList.remove('visible');
+        });
+
+        // Settings modal logic
+        settingsBtn.addEventListener('click', () => {
+            settingsModal.classList.add('visible');
+        });
+
+        closeSettingsBtn.addEventListener('click', () => {
+            settingsModal.classList.remove('visible');
+        });
+
+        colorThemeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const themeName = option.dataset.theme;
+                applyTheme(themeName);
+                colorThemeOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+            });
         });
 
     </script>
