@@ -291,7 +291,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.7);
-            background-color: #2d3748;
+            background-color: rgba(45, 55, 72, 0.8); /* Semi-transparent */
+            backdrop-filter: blur(8px); /* Flou d'arrière-plan */
+            -webkit-backdrop-filter: blur(8px); /* Compatibilité Safari */
             border: 2px solid #8b0000;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             z-index: 100;
@@ -304,6 +306,7 @@
             visibility: visible;
             transform: translate(-50%, -50%) scale(1);
             transition: opacity 0.3s ease, transform 0.3s ease;
+        
         }
         #access-denied-modal .close-icon {
             width: 4rem; height: 4rem; color: red; margin: 0 auto 1rem; animation: scale-up 0.5s ease-out;
